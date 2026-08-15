@@ -4411,6 +4411,684 @@ async function generateQuotation() {
    summary function above.
 */
 
+/* =========================================================
+   PDF SUMMARY + TERMS + FOOTERS + SAVE
+   ========================================================= */
+
+function createPDFSummaryAndFinish(
+    doc,
+    headerData,
+    footerData,
+    pageWidth,
+    pageHeight,
+    margin,
+    headerHeight,
+    footerHeight,
+    startY
+) {
+    let y = Number(startY) || headerHeight + 8;
+
+    const equipmentTotal =
+        getEquipmentTotal();
+
+    const copperTotal =
+        getCopperTotal();
+
+    const drainageTotal =
+        getDrainageTotal();
+
+    const installationTotal =
+        getInstallationCommissioningTotal();
+
+    const additionalItemsTotal =
+        getAdditionalItemsTotal();
+
+    const preliminariesTotal =
+        getPreliminariesTotal();
+
+    const asBuiltDrawingTotal =
+        getAsBuiltDrawingTotal();
+
+    const subtotal =
+        getQuotationSubtotal();
+
+    const vat =
+        getQuotationVAT();
+
+    const grandTotal =
+        getQuotationGrandTotal();
+
+
+    /* =====================================================
+       HELPER — START A NEW PDF PAGE
+       ===================================================== */
+
+    function addNewPDFPage() {
+        doc.addPage();
+
+        addHeaderImage(
+            doc,
+            headerData
+        );
+
+        y =
+            headerHeight + 8;
+    }
+
+
+    /* =====================================================
+       CHECK SPACE FOR SUMMARY
+       ===================================================== */
+
+    if (
+        y >
+        pageHeight -
+        footerHeight -
+        90
+    ) {
+        addNewPDFPage();
+    }
+
+
+    /* =====================================================
+       SUMMARY HEADING
+       ===================================================== */
+
+    doc.setFont(
+        "helvetica",
+        "bold"
+    );
+
+    doc.setFontSize(12);
+
+    doc.setTextColor(
+        7,
+        89,
+        133
+    );
+
+    doc.text(
+        "QUOTATION SUMMARY",
+        margin,
+        y
+    );
+
+    y += 5;
+
+
+    /* =====================================================
+       SUMMARY ROWS
+       ===================================================== */
+
+    const summaryRows = [];
+
+
+    if (equipmentTotal > 0) {
+        summaryRows.push([
+            "AC Equipment",
+            "1 lot",
+            money(equipmentTotal),
+            money(equipmentTotal)
+        ]);
+    }
+
+
+    if (copperTotal > 0) {
+        summaryRows.push([
+            "Copper Piping",
+            `${number(getTotalCopperLength())} m`,
+            money(quotation.copperRate),
+            money(copperTotal)
+        ]);
+    }
+
+
+    if (drainageTotal > 0) {
+        summaryRows.push([
+            "Drainage Piping",
+            `${number(getTotalDrainageLength())} m`,
+            money(quotation.drainageRate),
+            money(drainageTotal)
+        ]);
+    }
+
+
+    if (installationTotal > 0) {
+        summaryRows.push([
+            "Installation and Commissioning",
+            `${
+                Number(
+                    quotation.installationUnitCount
+                ) || 0
+            } units`,
+            money(
+                quotation.installationUnitCost
+            ),
+            money(installationTotal)
+        ]);
+    }
+
+
+    if (additionalItemsTotal > 0) {
+        summaryRows.push([
+            "Accessories / Additional Items",
+            "1 lot",
+            money(additionalItemsTotal),
+            money(additionalItemsTotal)
+        ]);
+    }
+
+
+    if (preliminariesTotal > 0) {
+        summaryRows.push([
+            "Preliminaries",
+            "1 lot",
+            money(preliminariesTotal),
+            money(preliminariesTotal)
+        ]);
+    }
+
+
+    if (asBuiltDrawingTotal > 0) {
+        summaryRows.push([
+            "As-Built Drawing",
+            "1 lot",
+            money(asBuiltDrawingTotal),
+            money(asBuiltDrawingTotal)
+        ]);
+    }
+
+
+    if (summaryRows.length === 0) {
+        summaryRows.push([
+            "Quotation Items",
+            "1 lot",
+            money(0),
+            money(0)
+        ]);
+    }
+
+
+    /* =====================================================
+       SUMMARY TABLE
+       ===================================================== */
+
+    doc.autoTable({
+
+        startY:
+            y,
+
+        head: [[
+            "Description",
+            "Quantity",
+            "Unit Price",
+            "Total"
+        ]],
+
+        body:
+            summaryRows,
+
+        theme:
+            "grid",
+
+        headStyles: {
+
+            fillColor: [
+                7,
+                89,
+                133
+            ],
+
+            textColor:
+                255,
+
+            fontStyle:
+                "bold"
+        },
+
+        styles: {
+
+            fontSize:
+                8,
+
+            cellPadding:
+                2.5,
+
+            valign:
+                "middle"
+        },
+
+        columnStyles: {
+
+            0: {
+                cellWidth:
+                    70
+            },
+
+            1: {
+                cellWidth:
+                    28
+            },
+
+            2: {
+                cellWidth:
+                    42,
+
+                halign:
+                    "right"
+            },
+
+            3: {
+                cellWidth:
+                    42,
+
+                halign:
+                    "right"
+            }
+        },
+
+        margin: {
+
+            left:
+                margin,
+
+            right:
+                margin,
+
+            bottom:
+                footerHeight
+        }
+    });
+
+
+    y =
+        doc.lastAutoTable.finalY +
+        8;
+
+
+    /* =====================================================
+       CHECK SPACE FOR TOTALS
+       ===================================================== */
+
+    if (
+        y >
+        pageHeight -
+        footerHeight -
+        45
+    ) {
+        addNewPDFPage();
+    }
+
+
+    /* =====================================================
+       SUBTOTAL
+       ===================================================== */
+
+    doc.setFont(
+        "helvetica",
+        "normal"
+    );
+
+    doc.setFontSize(10);
+
+    doc.setTextColor(
+        30,
+        41,
+        59
+    );
+
+    doc.text(
+        "Subtotal before VAT:",
+        margin,
+        y
+    );
+
+    doc.text(
+        money(subtotal),
+        pageWidth - margin,
+        y,
+        {
+            align:
+                "right"
+        }
+    );
+
+    y += 7;
+
+
+    /* =====================================================
+       VAT
+       ===================================================== */
+
+    doc.text(
+        "VAT @ 16%:",
+        margin,
+        y
+    );
+
+    doc.text(
+        money(vat),
+        pageWidth - margin,
+        y,
+        {
+            align:
+                "right"
+        }
+    );
+
+    y += 10;
+
+
+    /* =====================================================
+       GRAND TOTAL BOX
+       ===================================================== */
+
+    doc.setFillColor(
+        7,
+        89,
+        133
+    );
+
+    doc.roundedRect(
+        margin,
+        y - 5,
+        pageWidth - margin * 2,
+        17,
+        2,
+        2,
+        "F"
+    );
+
+    doc.setFont(
+        "helvetica",
+        "bold"
+    );
+
+    doc.setFontSize(11);
+
+    doc.setTextColor(
+        255,
+        255,
+        255
+    );
+
+    doc.text(
+        "TOTAL COST INCLUSIVE OF 16% VAT",
+        margin + 4,
+        y + 5
+    );
+
+    doc.text(
+        money(grandTotal),
+        pageWidth - margin - 4,
+        y + 5,
+        {
+            align:
+                "right"
+        }
+    );
+
+    y += 24;
+
+
+    /* =====================================================
+       CHECK SPACE FOR TERMS
+       ===================================================== */
+
+    if (
+        y >
+        pageHeight -
+        footerHeight -
+        75
+    ) {
+        addNewPDFPage();
+    }
+
+
+    /* =====================================================
+       TERMS AND CONDITIONS HEADING
+       ===================================================== */
+
+    doc.setFont(
+        "helvetica",
+        "bold"
+    );
+
+    doc.setFontSize(11);
+
+    doc.setTextColor(
+        7,
+        89,
+        133
+    );
+
+    doc.text(
+        "TERMS AND CONDITIONS OF SALES",
+        margin,
+        y
+    );
+
+    y += 6;
+
+
+    /* =====================================================
+       TERMS AND CONDITIONS
+       ===================================================== */
+
+    const terms = [
+
+        [
+            "Terms of payment:",
+            "100% advance payment payable to HOTPOINT APPLIANCES LTD or as per approved payment terms."
+        ],
+
+        [
+            "Warranty:",
+            "Two years warranty on equipment. The warranty shall apply according to the applicable warranty conditions."
+        ],
+
+        [
+            "Delivery timelines:",
+            "Delivery is expected within 8–12 weeks after order confirmation and receipt of the required advance payment."
+        ],
+
+        [
+            "Quotation validity:",
+            "This quotation is valid for 14 days from the quotation date."
+        ],
+
+        [
+            "Scope:",
+            "The scope of work is limited to the items included in the priced bill of quantities."
+        ],
+
+        [
+            "Exclusions:",
+            "Scaffolding, glass cutting, electrical work, masonry work, wall chasing, drilling and work on false ceilings are excluded unless specifically included."
+        ],
+
+        [
+            "Electrical works:",
+            "Electrical power supplies for the air conditioners shall be provided by the client. Guidance on the required supplies can be provided."
+        ],
+
+        [
+            "Site support:",
+            "The client shall provide site access, water, electricity and safe storage for equipment, tools and installation materials."
+        ],
+
+        [
+            "Operating temperature:",
+            "The recommended operating temperature range for the air-conditioning system is 18–30 degrees Celsius."
+        ]
+
+    ];
+
+
+    /* =====================================================
+       TERMS TABLE
+       ===================================================== */
+
+    doc.autoTable({
+
+        startY:
+            y,
+
+        body:
+            terms,
+
+        theme:
+            "plain",
+
+        styles: {
+
+            fontSize:
+                7.5,
+
+            cellPadding:
+                2,
+
+            textColor: [
+                40,
+                40,
+                40
+            ],
+
+            valign:
+                "top",
+
+            overflow:
+                "linebreak"
+        },
+
+        columnStyles: {
+
+            0: {
+
+                fontStyle:
+                    "bold",
+
+                cellWidth:
+                    38,
+
+                textColor: [
+                    7,
+                    89,
+                    133
+                ]
+            },
+
+            1: {
+
+                cellWidth:
+                    pageWidth -
+                    margin * 2 -
+                    38
+            }
+        },
+
+        margin: {
+
+            left:
+                margin,
+
+            right:
+                margin,
+
+            top:
+                headerHeight + 5,
+
+            bottom:
+                footerHeight
+        },
+
+        didDrawPage: function (data) {
+
+            /*
+               AutoTable may create extra pages if the terms
+               do not fit. Add the header to those new pages.
+            */
+
+            if (
+                data.pageNumber > 1 &&
+                headerData
+            ) {
+                addHeaderImage(
+                    doc,
+                    headerData
+                );
+            }
+        }
+    });
+
+
+    /* =====================================================
+       ADD FOOTERS TO EVERY PAGE
+       ===================================================== */
+
+    const totalPages =
+        doc.internal.getNumberOfPages();
+
+
+    for (
+        let pageNumber = 1;
+        pageNumber <= totalPages;
+        pageNumber++
+    ) {
+        doc.setPage(pageNumber);
+
+        addFooterToPage(
+            doc,
+            footerData,
+            pageNumber
+        );
+    }
+
+
+    /* =====================================================
+       CREATE SAFE PDF FILENAME
+       ===================================================== */
+
+    const safeClientName =
+        String(
+            quotation.clientName ||
+            "Client"
+        )
+
+            .trim()
+
+            .replace(
+                /[^a-z0-9]+/gi,
+                "_"
+            )
+
+            .replace(
+                /^_+|_+$/g,
+                ""
+            );
+
+
+    const filename =
+        `HVAC_Quotation_${
+            safeClientName ||
+            "Client"
+        }.pdf`;
+
+
+    /* =====================================================
+       DOWNLOAD PDF
+       ===================================================== */
+
+    doc.save(filename);
+
+
+    /* =====================================================
+       SHOW SUCCESS PAGE
+       ===================================================== */
+
+    showPage(15);
+}
+
 function createPDF(
     headerData,
     footerData
