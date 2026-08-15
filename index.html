@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -16,6 +15,143 @@
         rel="stylesheet"
         href="style.css"
     >
+
+    <!-- =====================================================
+         CENTERED PAGE LAYOUT
+    ====================================================== -->
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* ================================
+           HEADER
+        ================================= */
+
+        .app-header {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .header-content {
+            width: min(1100px, calc(100% - 32px));
+            margin: 0 auto;
+        }
+
+        /* ================================
+           MAIN APPLICATION
+        ================================= */
+
+        .app-container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ================================
+           PAGES
+        ================================= */
+
+        .page {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .page-card {
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* ================================
+           CENTER BUTTONS
+        ================================= */
+
+        .button-group,
+        .preview-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .full-width {
+            width: 100%;
+        }
+
+        /* ================================
+           QUOTATION
+        ================================= */
+
+        .quotation-preview-page {
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        #quotationPreview {
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* ================================
+           FOOTER
+        ================================= */
+
+        .app-footer {
+            width: 100%;
+            text-align: center;
+            margin: 0 auto;
+        }
+
+        /* ================================
+           MOBILE
+        ================================= */
+
+        @media (max-width: 700px) {
+
+            .app-container {
+                padding: 20px 10px;
+            }
+
+            .header-content {
+                width: calc(100% - 20px);
+            }
+
+            .page {
+                width: 100%;
+            }
+
+            .page-card {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
 
     <!-- =====================================================
          PDF LIBRARIES
@@ -56,6 +192,10 @@
 </header>
 
 
+
+<!-- =========================================================
+     MAIN APPLICATION
+========================================================= -->
 
 <main class="app-container">
 
@@ -151,10 +291,8 @@
         </h2>
 
         <p class="page-description">
-            Review the rooms before entering their
-            dimensions.
+            Review the rooms before entering their dimensions.
         </p>
-
 
         <div id="roomPreview"></div>
 
@@ -206,7 +344,6 @@
             Enter the length and width of every room.
         </p>
 
-
         <div id="dimensionInputs"></div>
 
 
@@ -257,7 +394,6 @@
             Review the calculated room areas.
         </p>
 
-
         <div id="dimensionPreview"></div>
 
 
@@ -305,10 +441,8 @@
         </h2>
 
         <p class="page-description">
-            Enter copper and drainage lengths for
-            each room.
+            Enter copper and drainage lengths for each room.
         </p>
-
 
         <div id="copperInputs"></div>
 
@@ -360,7 +494,6 @@
             Review the copper and drainage lengths.
         </p>
 
-
         <div id="copperPreview"></div>
 
 
@@ -408,10 +541,8 @@
         </h2>
 
         <p class="page-description">
-            Enter the base cooling load factor for each
-            room.
+            Enter the base cooling load factor for each room.
         </p>
-
 
         <div id="coolingLoadInputs"></div>
 
@@ -445,7 +576,7 @@
 
 <!-- =========================================================
      PAGE 8
-     AC RECOMMENDATION PREVIEW
+     AC RECOMMENDATION
 ========================================================= -->
 
 <section
@@ -460,10 +591,8 @@
         </h2>
 
         <p class="page-description">
-            Review the recommended AC capacity for
-            each room.
+            Review the recommended AC capacity for each room.
         </p>
-
 
         <div id="coolingLoadPreview"></div>
 
@@ -512,10 +641,8 @@
         </h2>
 
         <p class="page-description">
-            Enter the unit price for each recommended
-            AC capacity.
+            Enter the unit price for each recommended AC capacity.
         </p>
-
 
         <div id="acPriceInputs"></div>
 
@@ -564,8 +691,7 @@
         </h2>
 
         <p class="page-description">
-            Enter the rates used to calculate copper and
-            drainage costs.
+            Enter the rates used to calculate copper and drainage costs.
         </p>
 
 
@@ -654,10 +780,6 @@
 <!-- =========================================================
      PAGE 11
      INSTALLATION COMMISSIONING
-     
-     IMPORTANT:
-     The JavaScript replaces this page's contents
-     dynamically.
 ========================================================= -->
 
 <section
@@ -668,7 +790,7 @@
     <div class="page-card">
 
         <h2>
-            Installation Commissioning Cost
+            11. Installation Commissioning
         </h2>
 
         <p class="info-box">
@@ -683,7 +805,10 @@
 
 <!-- =========================================================
      PAGE 12
-     INSTALLATION COMMISSIONING & ACCESSORIES
+     ADDITIONAL WORKS
+     
+     Installation Commissioning is displayed FIRST by
+     JavaScript, followed by user-added additional works.
 ========================================================= -->
 
 <section
@@ -694,13 +819,15 @@
     <div class="page-card">
 
         <h2>
-            Installation Commissioning & Accessories
+            12. Additional Works
         </h2>
 
+        <p class="page-description">
+            Installation Commissioning appears first,
+            followed by any additional works you choose to add.
+        </p>
 
-        <div
-            id="additionalItems"
-        ></div>
+        <div id="additionalItems"></div>
 
     </div>
 
@@ -838,18 +965,8 @@
 
     <div class="page-card quotation-preview-page">
 
-        <div
-            id="quotationPreview"
-        ></div>
+        <div id="quotationPreview"></div>
 
-
-        <!-- =================================================
-             PREVIEW CONTROLS
-             
-             These buttons are outside the quotation
-             document and therefore are NOT included
-             in the PDF.
-        ================================================== -->
 
         <div class="preview-controls">
 
@@ -901,8 +1018,7 @@
 
 
         <p>
-            Your quotation PDF has been generated
-            successfully.
+            Your quotation PDF has been generated successfully.
         </p>
 
 
@@ -948,23 +1064,15 @@
 
 
 
-<!-- =========================================================
-     YEAR
-========================================================= -->
-
 <script>
 
-    const yearElement =
-        document.getElementById(
-            "currentYear"
-        );
+const yearElement =
+    document.getElementById("currentYear");
 
-    if (yearElement) {
-
-        yearElement.textContent =
-            new Date().getFullYear();
-
-    }
+if (yearElement) {
+    yearElement.textContent =
+        new Date().getFullYear();
+}
 
 </script>
 
@@ -974,9 +1082,7 @@
      APPLICATION JAVASCRIPT
 ========================================================= -->
 
-<script
-    src="script.js"
-></script>
+<script src="script.js"></script>
 
 
 </body>
