@@ -2284,8 +2284,8 @@ function saveInstallationCosts() {
 
 
     /*
-       Page 12 becomes the renamed
-       Installation Commissioning & Accessories page.
+       Page 12 is the Additional Works page.
+       Installation Commissioning is shown first, followed by user-added items.
     */
 
     renderAdditionalItems();
@@ -2928,78 +2928,90 @@ function renderAdditionalItemsPreview() {
     if (!container) return;
 
 
-    if (
-        quotation.additionalItems.length === 0
-    ) {
+    const installationCard = `
 
-        container.innerHTML = `
+        <div class="card">
 
-            <div class="empty-message">
+            <strong>
+                Installation Commissioning
+            </strong>
 
-                No additional items added.
+            <p>
+                ${number(quotation.installationUnitCount)} units
 
+                ×
+
+                ${money(quotation.installationUnitCost)}
+            </p>
+
+            <p>
+                Total:
+
+                <strong>
+                    ${money(getInstallationCommissioningTotal())}
+                </strong>
+            </p>
+
+            <div class="info-box">
+                Installation Commissioning is automatically calculated
+                and is always listed first under Additional Works.
             </div>
 
-        `;
+        </div>
 
-        return;
-    }
+    `;
+
+
+    const additionalCards =
+        quotation.additionalItems.length === 0
+            ? `
+                <div class="empty-message">
+                    No other additional items added.
+                </div>
+            `
+            : quotation.additionalItems
+                .map(
+                    (item, index) => `
+
+                        <div class="card">
+
+                            <strong>
+                                ${index + 1}.
+                                ${escapeHTML(item.name)}
+                            </strong>
+
+                            <p>
+                                ${number(item.quantity)}
+                                ${escapeHTML(item.unit)}
+                                ×
+                                ${money(item.unitPrice)}
+                            </p>
+
+                            <p>
+                                Total:
+                                <strong>
+                                    ${money(item.total)}
+                                </strong>
+                            </p>
+
+                            <button
+                                type="button"
+                                class="danger-button"
+                                onclick="deleteAdditionalItem(${index})"
+                            >
+                                Delete
+                            </button>
+
+                        </div>
+
+                    `
+                )
+                .join("");
 
 
     container.innerHTML =
-
-        quotation.additionalItems
-
-            .map(
-                (item, index) => `
-
-                    <div class="card">
-
-                        <strong>
-
-                            ${index + 1}.
-                            ${escapeHTML(item.name)}
-
-                        </strong>
-
-
-                        <p>
-
-                            ${number(item.quantity)}
-                            ${escapeHTML(item.unit)}
-
-                            ×
-
-                            ${money(item.unitPrice)}
-
-                        </p>
-
-
-                        <p>
-
-                            Total:
-
-                            <strong>
-                                ${money(item.total)}
-                            </strong>
-
-                        </p>
-
-
-                        <button
-                            type="button"
-                            class="danger-button"
-                            onclick="deleteAdditionalItem(${index})"
-                        >
-                            Delete
-                        </button>
-
-                    </div>
-
-                `
-            )
-
-            .join("");
+        installationCard +
+        additionalCards;
 }
 
 
@@ -3750,151 +3762,99 @@ function renderQuotationPreview() {
             </div>
 
 
-            <!-- INSTALLATION COMMISSIONING -->
+            <!-- ADDITIONAL WORKS -->
 
-<div class="quotation-section">
-    <h3>
-        4. INSTALLATION COMMISSIONING
-    </h3>
+            <div class="quotation-section">
 
-    <table>
-        <thead>
-            <tr>
-                <th class="number">
-                    No. of Units
-                </th>
-
-                <th class="number">
-                    Installation Cost / Unit
-                </th>
-
-                <th class="number">
-                    Total
-                </th>
-            </tr>
-        </thead>
-
-        <tbody>
-            <tr>
-                <td class="number">
-                    ${quotation.installationUnitCount}
-                </td>
-
-                <td class="number">
-                    ${money(
-                        quotation.installationUnitCost
-                    )}
-                </td>
-
-                <td class="number">
-                    ${money(
-                        installation
-                    )}
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+                <h3>
+                    4. ADDITIONAL WORKS
+                </h3>
 
 
-            <!-- ADDITIONAL ITEMS -->
+                <table>
 
-            ${
-                quotation.additionalItems.length > 0
+                    <thead>
 
-                    ? `
+                        <tr>
 
-                        <div
-                            class="quotation-section"
-                        >
+                            <th>
+                                Item
+                            </th>
 
-                            <h3>
-                                5. ADDITIONAL WORKS
-                            </h3>
+                            <th class="number">
+                                Quantity
+                            </th>
+
+                            <th class="number">
+                                Unit Price
+                            </th>
+
+                            <th class="number">
+                                Total
+                            </th>
+
+                        </tr>
+
+                    </thead>
 
 
-                            <table>
+                    <tbody>
 
-                                <thead>
+                        <tr>
+
+                            <td>
+                                Installation Commissioning
+                            </td>
+
+                            <td class="number">
+                                ${number(quotation.installationUnitCount)} units
+                            </td>
+
+                            <td class="number">
+                                ${money(quotation.installationUnitCost)}
+                            </td>
+
+                            <td class="number">
+                                ${money(installation)}
+                            </td>
+
+                        </tr>
+
+
+                        ${
+                            quotation.additionalItems
+                                .map(item => `
 
                                     <tr>
 
-                                        <th>
-                                            Item
-                                        </th>
+                                        <td>
+                                            ${escapeHTML(item.name)}
+                                        </td>
 
-                                        <th class="number">
-                                            Quantity
-                                        </th>
+                                        <td class="number">
+                                            ${number(item.quantity)}
+                                            ${escapeHTML(item.unit)}
+                                        </td>
 
-                                        <th class="number">
-                                            Unit Price
-                                        </th>
+                                        <td class="number">
+                                            ${money(item.unitPrice)}
+                                        </td>
 
-                                        <th class="number">
-                                            Total
-                                        </th>
+                                        <td class="number">
+                                            ${money(item.total)}
+                                        </td>
 
                                     </tr>
 
-                                </thead>
+                                `)
+                                .join("")
+                        }
 
+                    </tbody>
 
-                                <tbody>
+                </table>
 
-                                    ${
-                                        quotation
-                                            .additionalItems
-                                            .map(item => `
-
-                                                <tr>
-
-                                                    <td>
-                                                        ${escapeHTML(
-                                                            item.name
-                                                        )}
-                                                    </td>
-
-                                                    <td class="number">
-
-                                                        ${number(
-                                                            item.quantity
-                                                        )}
-
-                                                        ${escapeHTML(
-                                                            item.unit
-                                                        )}
-
-                                                    </td>
-
-                                                    <td class="number">
-                                                        ${money(
-                                                            item.unitPrice
-                                                        )}
-                                                    </td>
-
-                                                    <td class="number">
-                                                        ${money(
-                                                            item.total
-                                                        )}
-                                                    </td>
-
-                                                </tr>
-
-                                            `)
-                                            .join("")
-                                    }
-
-                                </tbody>
-
-                            </table>
-
-                        </div>
-
-                    `
-
-                    : ""
-            }
+            </div>
 
 
             <!-- SUMMARY -->
@@ -4898,14 +4858,15 @@ headStyles: {
 
 
     /* =====================================================
-       INSTALLATION COMMISSIONING
+       ADDITIONAL WORKS
+       Installation Commissioning is always first.
     ===================================================== */
 
     if (
         y >
         pageHeight -
         footerHeight -
-        55
+        80
     ) {
 
         doc.addPage();
@@ -4928,7 +4889,7 @@ headStyles: {
     doc.setFontSize(11);
 
     doc.text(
-        "4. INSTALLATION COMMISSIONING",
+        "4. ADDITIONAL WORKS",
         margin,
         y
     );
@@ -4936,33 +4897,70 @@ headStyles: {
     y += 3;
 
 
+    const additionalWorksRows = [
+
+        [
+            "Installation Commissioning",
+
+            `${number(
+                quotation.installationUnitCount
+            )} units`,
+
+            money(
+                quotation.installationUnitCost
+            ),
+
+            money(
+                getInstallationCommissioningTotal()
+            )
+        ],
+
+        ...quotation.additionalItems.map(
+            item => [
+
+                item.name,
+
+                `${number(
+                    item.quantity
+                )} ${item.unit}`,
+
+                money(
+                    item.unitPrice
+                ),
+
+                money(
+                    item.total
+                )
+            ]
+        )
+    ];
+
+
     doc.autoTable({
 
         startY:
             y,
 
-       head: [[
-    "No. of Units",
-    "Installation Cost / Unit",
-    "Total"
-]],
+        head: [[
 
-body: [[
-    String(
-        quotation.installationUnitCount
-    ),
-    money(
-        quotation.installationUnitCost
-    ),
-    money(
-        getInstallationCommissioningTotal()
-    )
-]],
+            "Item",
+
+            "Quantity",
+
+            "Unit Price",
+
+            "Total"
+
+        ]],
+
+        body:
+            additionalWorksRows,
 
         theme:
             "grid",
 
         headStyles: {
+
             fillColor: [
                 7,
                 89,
@@ -4971,17 +4969,21 @@ body: [[
 
             textColor:
                 255
+
         },
 
         styles: {
+
             fontSize:
-                7.5,
+                8,
 
             cellPadding:
                 2.5
+
         },
 
         margin: {
+
             left:
                 margin,
 
@@ -4990,6 +4992,7 @@ body: [[
 
             bottom:
                 footerHeight
+
         }
     });
 
@@ -4997,177 +5000,6 @@ body: [[
     y =
         doc.lastAutoTable.finalY +
         8;
-
-
-    /* =====================================================
-       ADDITIONAL WORKS
-    ===================================================== */
-
-    if (
-        quotation.additionalItems.length >
-        0
-    ) {
-
-        doc.setFont(
-            "helvetica",
-            "bold"
-        );
-
-
-        doc.setFontSize(11);
-
-
-        doc.text(
-            "5. ADDITIONAL WORKS",
-            margin,
-            y
-        );
-
-
-        y += 3;
-
-
-        const rows =
-            quotation.additionalItems.map(
-                item => [
-
-                    item.name,
-
-                    `${number(
-                        item.quantity
-                    )} ${item.unit}`,
-
-                    money(
-                        item.unitPrice
-                    ),
-
-                    money(
-                        item.total
-                    )
-
-                ]
-            );
-
-
-        doc.autoTable({
-
-            startY:
-                y,
-
-            head: [[
-
-                "Item",
-
-                "Quantity",
-
-                "Unit Price",
-
-                "Total"
-
-            ]],
-
-            body:
-                rows,
-
-            theme:
-                "grid",
-
-            headStyles: {
-
-                fillColor: [
-                    7,
-                    89,
-                    133
-                ],
-
-                textColor:
-                    255
-
-            },
-
-            styles: {
-
-                fontSize:
-                    8,
-
-                cellPadding:
-                    2.5
-
-            },
-
-            margin: {
-
-                left:
-                    margin,
-
-                right:
-                    margin,
-
-                bottom:
-                    footerHeight
-
-            }
-
-        });
-
-
-        y =
-            doc.lastAutoTable.finalY +
-            8;
-
-    }
-
-/* =========================================================
-   SECTION 7 OF 7
-   PDF SUMMARY + TERMS + FOOTERS + RESET
-   ========================================================= */
-
-
-/* =========================================================
-   CONTINUE CREATE PDF
-   ========================================================= */
-
-
-/*
-   This function is intentionally separate so that the
-   complete script can be pasted in seven manageable parts.
-*/
-
-
-function createPDFSummaryAndFinish(
-    doc,
-    headerData,
-    footerData,
-    pageWidth,
-    pageHeight,
-    margin,
-    headerHeight,
-    footerHeight,
-    y
-) {
-
-    const hvacWorks =
-        getHVACTotal();
-
-
-    const preliminaries =
-        getPreliminariesTotal();
-
-
-    const asBuiltDrawing =
-        getAsBuiltDrawingTotal();
-
-
-    const subtotal =
-        getQuotationSubtotal();
-
-
-    const vat =
-        getQuotationVAT();
-
-
-    const grandTotal =
-        getQuotationGrandTotal();
 
 
     /* =====================================================
@@ -6212,103 +6044,141 @@ function createPDF(
 
 
     /* =====================================================
-       ADDITIONAL ITEMS
+       ADDITIONAL WORKS
+       Installation Commissioning is always first.
     ===================================================== */
 
     if (
-        quotation.additionalItems.length
+        y >
+        pageHeight -
+        footerHeight -
+        80
     ) {
 
-        doc.text(
-            "4. ADDITIONAL WORKS",
-            margin,
-            y
+        doc.addPage();
+
+        addHeaderImage(
+            doc,
+            headerData
         );
 
+        y =
+            headerHeight + 8;
+    }
 
-        y += 3;
+
+    doc.setFont(
+        "helvetica",
+        "bold"
+    );
+
+    doc.setFontSize(11);
+
+    doc.text(
+        "4. ADDITIONAL WORKS",
+        margin,
+        y
+    );
 
 
-        doc.autoTable({
+    y += 3;
 
-            startY:
-                y,
 
-            head: [[
-                "Item",
-                "Quantity",
-                "Unit Price",
-                "Total"
-            ]],
+    const additionalWorksRows = [
 
-            body:
+        [
+            "Installation Commissioning",
 
-                quotation.additionalItems.map(
-                    item => [
+            `${number(
+                quotation.installationUnitCount
+            )} units`,
 
-                        item.name,
+            money(
+                quotation.installationUnitCost
+            ),
 
-                        `${number(
-                            item.quantity
-                        )} ${item.unit}`,
+            money(
+                getInstallationCommissioningTotal()
+            )
+        ],
 
-                        money(
-                            item.unitPrice
-                        ),
+        ...quotation.additionalItems.map(
+            item => [
 
-                        money(
-                            item.total
-                        )
+                item.name,
 
-                    ]
+                `${number(
+                    item.quantity
+                )} ${item.unit}`,
+
+                money(
+                    item.unitPrice
                 ),
 
-            theme:
-                "grid",
-
-            headStyles: {
-
-                fillColor: [
-                    7,
-                    89,
-                    133
-                ],
-
-                textColor:
-                    255
-
-            },
-
-            styles: {
-
-                fontSize:
-                    8,
-
-                cellPadding:
-                    2.5
-
-            },
-
-            margin: {
-
-                left:
-                    margin,
-
-                right:
-                    margin,
-
-                bottom:
-                    footerHeight
-
-            }
-
-        });
+                money(
+                    item.total
+                )
+            ]
+        )
+    ];
 
 
-        y =
-            doc.lastAutoTable.finalY +
-            8;
-    }
+    doc.autoTable({
+
+        startY:
+            y,
+
+        head: [[
+            "Item",
+            "Quantity",
+            "Unit Price",
+            "Total"
+        ]],
+
+        body:
+            additionalWorksRows,
+
+        theme:
+            "grid",
+
+        headStyles: {
+
+            fillColor: [
+                7,
+                89,
+                133
+            ],
+
+            textColor:
+                255
+        },
+
+        styles: {
+
+            fontSize:
+                8,
+
+            cellPadding:
+                2.5
+        },
+
+        margin: {
+
+            left:
+                margin,
+
+            right:
+                margin,
+
+            bottom:
+                footerHeight
+        }
+    });
+
+
+    y =
+        doc.lastAutoTable.finalY +
+        8;
 
 
     /* =====================================================
