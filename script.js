@@ -3752,83 +3752,49 @@ function renderQuotationPreview() {
 
             <!-- INSTALLATION COMMISSIONING -->
 
-            <div class="quotation-section">
+<div class="quotation-section">
+    <h3>
+        4. INSTALLATION COMMISSIONING
+    </h3>
 
-                <h3>
-                    4. INSTALLATION COMMISSIONING
-                </h3>
+    <table>
+        <thead>
+            <tr>
+                <th class="number">
+                    No. of Units
+                </th>
 
+                <th class="number">
+                    Installation Cost / Unit
+                </th>
 
-                <table>
+                <th class="number">
+                    Total
+                </th>
+            </tr>
+        </thead>
 
-                    <thead>
+        <tbody>
+            <tr>
+                <td class="number">
+                    ${quotation.installationUnitCount}
+                </td>
 
-                        <tr>
+                <td class="number">
+                    ${money(
+                        quotation.installationUnitCost
+                    )}
+                </td>
 
-                            <th>
-                                Location
-                            </th>
-
-                            <th>
-                                AC Type
-                            </th>
-
-                            <th class="number">
-                                No. of Units
-                            </th>
-
-                            <th class="number">
-                                Installation Cost / Unit
-                            </th>
-
-                            <th class="number">
-                                Total
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody>
-
-                        <tr>
-
-                            <td>
-                                ${escapeHTML(
-                                    quotation.installationRegion
-                                )}
-                            </td>
-
-                            <td>
-                                ${escapeHTML(
-                                    quotation.acType
-                                )}
-                            </td>
-
-                            <td class="number">
-                                ${quotation.installationUnitCount}
-                            </td>
-
-                            <td class="number">
-                                ${money(
-                                    quotation.installationUnitCost
-                                )}
-                            </td>
-
-                            <td class="number">
-                                ${money(
-                                    installation
-                                )}
-                            </td>
-
-                        </tr>
-
-                    </tbody>
-
-                </table>
-
-            </div>
+                <td class="number">
+                    ${money(
+                        installation
+                    )}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
 
             <!-- ADDITIONAL ITEMS -->
@@ -4975,27 +4941,23 @@ headStyles: {
         startY:
             y,
 
-        head: [[
-            "Location",
-            "AC Type",
-            "No. of Units",
-            "Installation Cost / Unit",
-            "Total"
-        ]],
+       head: [[
+    "No. of Units",
+    "Installation Cost / Unit",
+    "Total"
+]],
 
-        body: [[
-            quotation.installationRegion,
-            quotation.acType,
-            String(
-                quotation.installationUnitCount
-            ),
-            money(
-                quotation.installationUnitCost
-            ),
-            money(
-                getInstallationCommissioningTotal()
-            )
-        ]],
+body: [[
+    String(
+        quotation.installationUnitCount
+    ),
+    money(
+        quotation.installationUnitCost
+    ),
+    money(
+        getInstallationCommissioningTotal()
+    )
+]],
 
         theme:
             "grid",
