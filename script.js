@@ -106,6 +106,7 @@ function showPage(pageNumber) {
        unchanged while allowing the new installation page
        and quotation-preview order.
     */
+
     if (!page && pageNumber === 15) {
 
         page = document.createElement("section");
@@ -115,8 +116,15 @@ function showPage(pageNumber) {
 
         page.innerHTML = `
             <div class="card">
-                <h2>Quotation Generated</h2>
-                <p>Your quotation has been generated successfully.</p>
+
+                <h2>
+                    Quotation Generated
+                </h2>
+
+                <p>
+                    Your quotation has been generated successfully.
+                </p>
+
                 <button
                     type="button"
                     class="primary-button full-width"
@@ -124,6 +132,7 @@ function showPage(pageNumber) {
                 >
                     Start New Quotation
                 </button>
+
             </div>
         `;
 
@@ -362,7 +371,15 @@ function saveRooms() {
 
             coolingLoad: 0,
 
-            capacity: 0
+            capacity: 0,
+
+            /*
+               Each room can have one or more AC units.
+               Individual capacities, types and brands
+               will be stored in this array.
+            */
+
+            acUnits: []
 
         }));
 
@@ -460,7 +477,9 @@ function renderRoomPreview() {
 function renameRoom(index) {
 
     if (!quotation.rooms[index]) {
+
         return;
+
     }
 
 
@@ -492,7 +511,9 @@ function renameRoom(index) {
 function deleteRoom(index) {
 
     if (!quotation.rooms[index]) {
+
         return;
+
     }
 
 
@@ -814,7 +835,7 @@ function renderDimensionPreview() {
 
                     </tr>
 
-</thead>
+                </thead>
 
 
                 <tbody>
@@ -840,10 +861,12 @@ function renderDimensionPreview() {
                                     </td>
 
                                     <td class="number">
+
                                         <strong>
                                             ${number(room.area)}
                                             m²
                                         </strong>
+
                                     </td>
 
                                 </tr>
@@ -862,7 +885,6 @@ function renderDimensionPreview() {
 }
 
 /* =========================================================
-
    SECTION 2 OF 7
    COPPER + DRAINAGE
    ========================================================= */
@@ -875,7 +897,23 @@ function renderDimensionPreview() {
 
 function goToCopper() {
 
+    if (
+        !quotation.rooms ||
+        quotation.rooms.length === 0
+    ) {
+
+        alert(
+            "Please add rooms before entering copper and drainage lengths."
+        );
+
+        showPage(1);
+
+        return;
+    }
+
+
     renderCopperInputs();
+
 
     showPage(5);
 }
@@ -902,10 +940,8 @@ function renderCopperInputs() {
                     <div class="card">
 
                         <h3>
-
                             ${index + 1}.
                             ${escapeHTML(room.name)}
-
                         </h3>
 
 
@@ -919,7 +955,7 @@ function renderCopperInputs() {
                                 step="0.01"
                                 id="copper-${index}"
                                 value="${room.copper || ""}"
-                                placeholder="e.g. 8"
+                                placeholder="e.g. 5"
                             >
 
                         </label>
@@ -940,20 +976,6 @@ function renderCopperInputs() {
 
                         </label>
 
-
-                        <div class="info-box">
-
-                            <strong>
-                                ${escapeHTML(room.name)}
-                            </strong>
-
-                            <br>
-
-                            Enter the copper and drainage
-                            length required for this room.
-
-                        </div>
-
                     </div>
 
                 `
@@ -964,7 +986,7 @@ function renderCopperInputs() {
 
 
 /* =========================================================
-   SAVE COPPER + DRAINAGE
+   SAVE AND PREVIEW COPPER + DRAINAGE
    ========================================================= */
 
 function previewCopper() {
@@ -975,34 +997,33 @@ function previewCopper() {
     quotation.rooms.forEach(
         (room, index) => {
 
+            const copperInput =
+                document.getElementById(
+                    `copper-${index}`
+                );
+
+
+            const drainageInput =
+                document.getElementById(
+                    `drainage-${index}`
+                );
+
+
             const copper =
                 Number(
-                    document.getElementById(
-                        `copper-${index}`
-                    )?.value
+                    copperInput?.value
                 );
 
 
             const drainage =
                 Number(
-                    document.getElementById(
-                        `drainage-${index}`
-                    )?.value
+                    drainageInput?.value
                 );
 
 
             if (
                 !Number.isFinite(copper) ||
-                copper < 0
-            ) {
-
-                valid = false;
-
-                return;
-            }
-
-
-            if (
+                copper < 0 ||
                 !Number.isFinite(drainage) ||
                 drainage < 0
             ) {
@@ -1045,40 +1066,6 @@ function previewCopper() {
    COPPER + DRAINAGE PREVIEW
    ========================================================= */
 
-function getTotalCopperLength() {
-
-    return quotation.rooms.reduce(
-
-        (sum, room) =>
-
-            sum +
-            Number(
-                room.copper || 0
-            ),
-
-        0
-
-    );
-}
-
-
-function getTotalDrainageLength() {
-
-    return quotation.rooms.reduce(
-
-        (sum, room) =>
-
-            sum +
-            Number(
-                room.drainage || 0
-            ),
-
-        0
-
-    );
-}
-
-
 function renderCopperPreview() {
 
     const container =
@@ -1091,11 +1078,21 @@ function renderCopperPreview() {
 
 
     const totalCopper =
-        getTotalCopperLength();
+        quotation.rooms.reduce(
+            (sum, room) =>
+                sum +
+                Number(room.copper || 0),
+            0
+        );
 
 
     const totalDrainage =
-        getTotalDrainageLength();
+        quotation.rooms.reduce(
+            (sum, room) =>
+                sum +
+                Number(room.drainage || 0),
+            0
+        );
 
 
     container.innerHTML = `
@@ -1153,28 +1150,38 @@ function renderCopperPreview() {
                             .join("")
                     }
 
+
+                    <tr>
+
+                        <td>
+                            <strong>
+                                Total
+                            </strong>
+                        </td>
+
+                        <td class="number">
+
+                            <strong>
+                                ${number(totalCopper)}
+                                m
+                            </strong>
+
+                        </td>
+
+                        <td class="number">
+
+                            <strong>
+                                ${number(totalDrainage)}
+                                m
+                            </strong>
+
+                        </td>
+
+                    </tr>
+
                 </tbody>
 
             </table>
-
-        </div>
-
-
-        <div class="info-box">
-
-            <strong>
-                Total Copper:
-            </strong>
-
-            ${number(totalCopper)} m
-
-            <br><br>
-
-            <strong>
-                Total Drainage:
-            </strong>
-
-            ${number(totalDrainage)} m
 
         </div>
 
@@ -1183,7 +1190,27 @@ function renderCopperPreview() {
 
 
 /* =========================================================
-   STEP 6 → COOLING LOAD
+   COMPATIBILITY FUNCTIONS
+
+   These functions support HTML versions that use separate
+   copper and drainage buttons.
+   ========================================================= */
+
+function goToDrainage() {
+
+    previewCopper();
+}
+
+
+function previewDrainage() {
+
+    previewCopper();
+}
+
+
+/* =========================================================
+   STEP 7
+   COOLING LOAD FACTORS
    ========================================================= */
 
 function goToCoolingLoad() {
@@ -1194,7 +1221,7 @@ function goToCoolingLoad() {
     ) {
 
         alert(
-            "No rooms have been added."
+            "Please add rooms before entering cooling load factors."
         );
 
         showPage(1);
@@ -1211,7 +1238,7 @@ function goToCoolingLoad() {
 
 
 /* =========================================================
-   COOLING LOAD INPUTS
+   RENDER COOLING LOAD INPUTS
    ========================================================= */
 
 function renderCoolingLoadInputs() {
@@ -1232,13 +1259,11 @@ function renderCoolingLoadInputs() {
             .map(
                 (room, index) => `
 
-                    <div class="cooling-card">
+                    <div class="card">
 
                         <h3>
-
                             ${index + 1}.
                             ${escapeHTML(room.name)}
-
                         </h3>
 
 
@@ -1256,28 +1281,39 @@ function renderCoolingLoadInputs() {
 
                         <label>
 
-                            Base Cooling Load Factor
+                            Cooling Load Factor
+                            (BTU/hr per m²)
 
                             <input
                                 type="number"
                                 min="1"
                                 step="1"
                                 id="factor-${index}"
-                                value="${room.coolingFactor || ""}"
+                                value="${room.coolingFactor || 700}"
                                 placeholder="e.g. 700"
+                                oninput="updateCoolingLoadPreview(${index})"
                             >
 
                         </label>
 
 
-                        <div class="area-result">
+                        <div class="info-box">
 
                             Calculated Cooling Load:
 
                             <strong
                                 id="load-${index}"
                             >
-                                0 BTU/hr
+                                ${
+                                    number(
+                                        Number(room.area) *
+                                        Number(
+                                            room.coolingFactor ||
+                                            700
+                                        )
+                                    )
+                                }
+                                BTU/hr
                             </strong>
 
                         </div>
@@ -1288,25 +1324,12 @@ function renderCoolingLoadInputs() {
             )
 
             .join("");
-
-
-    quotation.rooms.forEach(
-        (room, index) => {
-
-            document
-                .getElementById(
-                    `factor-${index}`
-                )
-                ?.addEventListener(
-                    "input",
-                    () =>
-                        updateCoolingLoadPreview(index)
-                );
-
-        }
-    );
 }
 
+
+/* =========================================================
+   LIVE COOLING LOAD PREVIEW
+   ========================================================= */
 
 function updateCoolingLoadPreview(index) {
 
@@ -1364,29 +1387,23 @@ function updateCoolingLoadPreview(index) {
 }
 
 /* =========================================================
-
-
-SECTION 3 OF 7
+   SECTION 3 OF 7
    AC RECOMMENDATION + AC PRICES
    ========================================================= */
 
 
 /* =========================================================
-   SELECT AC CAPACITY
+   SELECT A SINGLE AC CAPACITY
    ========================================================= */
 
 function selectCapacity(load) {
 
-    for (
-        const capacity
-        of AC_CAPACITIES
-    ) {
+    for (const capacity of AC_CAPACITIES) {
 
-        if (
-            load <= capacity
-        ) {
+        if (load <= capacity) {
 
             return capacity;
+
         }
     }
 
@@ -1394,6 +1411,84 @@ function selectCapacity(load) {
     return AC_CAPACITIES[
         AC_CAPACITIES.length - 1
     ];
+}
+
+
+/* =========================================================
+   RECOMMEND THE MINIMUM NUMBER OF AC UNITS
+
+   The maximum capacity is selected first.
+
+   Example:
+   Required cooling load: 100,000 BTU/hr
+
+   Recommended units:
+   48,000 + 48,000 + 9,000 = 105,000 BTU/hr
+   ========================================================= */
+
+function recommendACUnits(load) {
+
+    let remaining =
+        Math.max(
+            0,
+            Number(load) || 0
+        );
+
+
+    const maximumCapacity =
+        AC_CAPACITIES[
+            AC_CAPACITIES.length - 1
+        ];
+
+
+    const units = [];
+
+
+    while (
+        remaining >
+        maximumCapacity
+    ) {
+
+        units.push({
+
+            capacity:
+                maximumCapacity,
+
+            type:
+                "HIGHWALL",
+
+            brand:
+                "LG"
+
+        });
+
+
+        remaining -=
+            maximumCapacity;
+    }
+
+
+    if (remaining > 0) {
+
+        units.push({
+
+            capacity:
+                selectCapacity(
+                    remaining
+                ),
+
+            type:
+                "HIGHWALL",
+
+            brand:
+                "LG"
+
+        });
+
+    }
+
+
+    return units;
 }
 
 
@@ -1464,9 +1559,28 @@ function previewCoolingLoad() {
                 factor;
 
 
-            room.capacity =
-                selectCapacity(
+            room.acUnits =
+                recommendACUnits(
                     room.coolingLoad
+                );
+
+
+            /*
+               Keep room.capacity for compatibility with
+               any older sections of the application.
+
+               If the room has several AC units, capacity
+               stores their total installed capacity.
+            */
+
+            room.capacity =
+                room.acUnits.reduce(
+                    (sum, unit) =>
+                        sum +
+                        Number(
+                            unit.capacity || 0
+                        ),
+                    0
                 );
 
         }
@@ -1481,6 +1595,14 @@ function previewCoolingLoad() {
 
         return;
     }
+
+
+    /*
+       Any earlier prices are cleared because recalculating
+       recommendations may change the equipment combinations.
+    */
+
+    quotation.acPrices = [];
 
 
     renderCoolingLoadPreview();
@@ -1510,78 +1632,397 @@ function renderCoolingLoadPreview() {
         quotation.rooms
 
             .map(
-                (room, index) => `
+                (room, roomIndex) => {
 
-                    <div class="card">
+                    const totalSelectedCapacity =
 
-                        <h3>
-
-                            ${index + 1}.
-                            ${escapeHTML(room.name)}
-
-                        </h3>
-
-
-                        <p>
-
-                            Room Area:
-
-                            <strong>
-                                ${number(room.area)}
-                                m²
-                            </strong>
-
-                        </p>
+                        (room.acUnits || [])
+                            .reduce(
+                                (sum, unit) =>
+                                    sum +
+                                    Number(
+                                        unit.capacity || 0
+                                    ),
+                                0
+                            );
 
 
-                        <p>
+                    return `
 
-                            Cooling Load Factor:
+                        <div class="card">
 
-                            ${number(
-                                room.coolingFactor
-                            )}
+                            <h3>
 
-                        </p>
+                                ${roomIndex + 1}.
+                                ${escapeHTML(room.name)}
 
-
-                        <p>
-
-                            Calculated Cooling Load:
-
-                            <strong>
-                                ${number(
-                                    room.coolingLoad
-                                )}
-                                BTU/hr
-                            </strong>
-
-                        </p>
+                            </h3>
 
 
-                        <p>
-                            Recommended AC:
-                        </p>
+                            <p>
+
+                                Room Area:
+
+                                <strong>
+
+                                    ${number(room.area)}
+                                    m²
+
+                                </strong>
+
+                            </p>
 
 
-                        <span class="capacity-badge">
+                            <p>
 
-                            ${Number(
-                                room.capacity
-                            ).toLocaleString(
-                                "en-KE"
-                            )}
+                                Cooling Load Factor:
 
-                            BTU/hr
+                                <strong>
 
-                        </span>
+                                    ${number(
+                                        room.coolingFactor
+                                    )}
 
-                    </div>
+                                </strong>
 
-                `
+                            </p>
+
+
+                            <p>
+
+                                Calculated Cooling Load:
+
+                                <strong>
+
+                                    ${number(
+                                        room.coolingLoad
+                                    )}
+                                    BTU/hr
+
+                                </strong>
+
+                            </p>
+
+
+                            <p>
+
+                                <strong>
+                                    Recommended AC Unit(s):
+                                </strong>
+
+                            </p>
+
+
+                            ${
+                                (room.acUnits || [])
+
+                                    .map(
+                                        (unit, unitIndex) => `
+
+                                            <div
+                                                class="ac-recommendation-unit"
+                                            >
+
+                                                <h4>
+
+                                                    Unit
+                                                    ${unitIndex + 1}
+
+                                                </h4>
+
+
+                                                <label>
+
+                                                    Capacity
+                                                    (BTU/hr)
+
+                                                    <select
+                                                        onchange="
+                                                            updateRecommendedAC(
+                                                                ${roomIndex},
+                                                                ${unitIndex},
+                                                                'capacity',
+                                                                this.value
+                                                            )
+                                                        "
+                                                    >
+
+                                                        ${
+                                                            AC_CAPACITIES
+
+                                                                .map(
+                                                                    capacity => `
+
+                                                                        <option
+                                                                            value="${capacity}"
+
+                                                                            ${
+                                                                                Number(
+                                                                                    unit.capacity
+                                                                                ) ===
+                                                                                capacity
+
+                                                                                    ? "selected"
+                                                                                    : ""
+                                                                            }
+                                                                        >
+
+                                                                            ${
+                                                                                capacity
+                                                                                    .toLocaleString(
+                                                                                        "en-KE"
+                                                                                    )
+                                                                            }
+
+                                                                            BTU/hr
+
+                                                                        </option>
+
+                                                                    `
+                                                                )
+
+                                                                .join("")
+                                                        }
+
+                                                    </select>
+
+                                                </label>
+
+
+                                                <label>
+
+                                                    AC Type
+
+                                                    <select
+                                                        onchange="
+                                                            updateRecommendedAC(
+                                                                ${roomIndex},
+                                                                ${unitIndex},
+                                                                'type',
+                                                                this.value
+                                                            )
+                                                        "
+                                                    >
+
+                                                        ${
+                                                            [
+                                                                "HIGHWALL",
+                                                                "CASSETTE",
+                                                                "DUCTABLE AC",
+                                                                "PORTABLE AC"
+                                                            ]
+
+                                                                .map(
+                                                                    type => `
+
+                                                                        <option
+                                                                            value="${type}"
+
+                                                                            ${
+                                                                                unit.type ===
+                                                                                type
+
+                                                                                    ? "selected"
+                                                                                    : ""
+                                                                            }
+                                                                        >
+
+                                                                            ${type}
+
+                                                                        </option>
+
+                                                                    `
+                                                                )
+
+                                                                .join("")
+                                                        }
+
+                                                    </select>
+
+                                                </label>
+
+
+                                                <label>
+
+                                                    Brand
+
+                                                    <select
+                                                        onchange="
+                                                            updateRecommendedAC(
+                                                                ${roomIndex},
+                                                                ${unitIndex},
+                                                                'brand',
+                                                                this.value
+                                                            )
+                                                        "
+                                                    >
+
+                                                        ${
+                                                            [
+                                                                "VON",
+                                                                "LG",
+                                                                "DAIKIN"
+                                                            ]
+
+                                                                .map(
+                                                                    brand => `
+
+                                                                        <option
+                                                                            value="${brand}"
+
+                                                                            ${
+                                                                                unit.brand ===
+                                                                                brand
+
+                                                                                    ? "selected"
+                                                                                    : ""
+                                                                            }
+                                                                        >
+
+                                                                            ${brand}
+
+                                                                        </option>
+
+                                                                    `
+                                                                )
+
+                                                                .join("")
+                                                        }
+
+                                                    </select>
+
+                                                </label>
+
+                                            </div>
+
+                                        `
+                                    )
+
+                                    .join("")
+                            }
+
+
+                            <div class="info-box">
+
+                                Total Selected Capacity:
+
+                                <strong>
+
+                                    ${
+                                        totalSelectedCapacity
+                                            .toLocaleString(
+                                                "en-KE"
+                                            )
+                                    }
+
+                                    BTU/hr
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                }
             )
 
             .join("");
+}
+
+
+/* =========================================================
+   UPDATE A RECOMMENDED AC
+   ========================================================= */
+
+function updateRecommendedAC(
+    roomIndex,
+    unitIndex,
+    field,
+    value
+) {
+
+    const room =
+        quotation.rooms[
+            roomIndex
+        ];
+
+
+    const unit =
+        room &&
+        room.acUnits &&
+        room.acUnits[
+            unitIndex
+        ];
+
+
+    if (
+        !unit ||
+        ![
+            "capacity",
+            "type",
+            "brand"
+        ].includes(field)
+    ) {
+
+        return;
+    }
+
+
+    if (field === "capacity") {
+
+        const capacity =
+            Number(value);
+
+
+        if (
+            !AC_CAPACITIES.includes(
+                capacity
+            )
+        ) {
+
+            return;
+        }
+
+
+        unit.capacity =
+            capacity;
+
+    } else {
+
+        unit[field] =
+            String(value);
+
+    }
+
+
+    room.capacity =
+        room.acUnits.reduce(
+            (sum, item) =>
+                sum +
+                Number(
+                    item.capacity || 0
+                ),
+            0
+        );
+
+
+    /*
+       Prices depend on the exact combination of capacity,
+       AC type and brand. Clear earlier prices whenever a
+       selection changes.
+    */
+
+    quotation.acPrices = [];
+
+
+    /*
+       Render the preview again so the total selected
+       capacity is updated immediately.
+    */
+
+    renderCoolingLoadPreview();
 }
 
 
@@ -1604,15 +2045,20 @@ function goToACPrices() {
     }
 
 
-    const missing =
+    const missingRecommendation =
+
         quotation.rooms.some(
             room =>
-                !room.capacity ||
-                room.capacity <= 0
+
+                !Array.isArray(
+                    room.acUnits
+                ) ||
+
+                room.acUnits.length === 0
         );
 
 
-    if (missing) {
+    if (missingRecommendation) {
 
         alert(
             "AC recommendations have not been calculated."
@@ -1630,43 +2076,124 @@ function goToACPrices() {
     showPage(9);
 }
 
+
 /* =========================================================
-   AC PRICE HELPERS
+   GET AC EQUIPMENT COMBINATIONS
+
+   AC units are grouped only when they have the same:
+   1. Capacity
+   2. AC type
+   3. Brand
+
+   The rooms served by every combination are retained.
    ========================================================= */
 
-function getUniqueCapacities() {
+function getACCombinations() {
+
+    const combinations =
+        new Map();
+
+
+    quotation.rooms.forEach(
+        room => {
+
+            (room.acUnits || [])
+                .forEach(unit => {
+
+                    const capacity =
+                        Number(
+                            unit.capacity
+                        ) || 0;
+
+
+                    const type =
+                        unit.type ||
+                        "HIGHWALL";
+
+
+                    const brand =
+                        unit.brand ||
+                        "LG";
+
+
+                    const key =
+                        `${capacity}|${type}|${brand}`;
+
+
+                    if (
+                        !combinations.has(key)
+                    ) {
+
+                        combinations.set(
+                            key,
+                            {
+
+                                key,
+
+                                capacity,
+
+                                type,
+
+                                brand,
+
+                                rooms: [],
+
+                                quantity: 0
+
+                            }
+                        );
+
+                    }
+
+
+                    const item =
+                        combinations.get(key);
+
+
+                    item.quantity += 1;
+
+
+                    if (
+                        !item.rooms.includes(
+                            room.name
+                        )
+                    ) {
+
+                        item.rooms.push(
+                            room.name
+                        );
+
+                    }
+
+                });
+
+        }
+    );
+
 
     return [
 
-        ...new Set(
-
-            quotation.rooms.map(
-                room =>
-                    room.capacity
-            )
-
-        )
+        ...combinations.values()
 
     ].sort(
-        (a, b) => a - b
+        (a, b) =>
+
+            b.capacity -
+            a.capacity ||
+
+            a.type.localeCompare(
+                b.type
+            ) ||
+
+            a.brand.localeCompare(
+                b.brand
+            )
     );
 }
 
 
-function getCapacityQuantity(
-    capacity
-) {
-
-    return quotation.rooms.filter(
-        room =>
-            room.capacity ===
-            capacity
-    ).length;
-}
-
-
 /* =========================================================
-   AC PRICE INPUTS
+   RENDER AC PRICE INPUTS
    ========================================================= */
 
 function renderACPriceInputs() {
@@ -1680,21 +2207,40 @@ function renderACPriceInputs() {
     if (!container) return;
 
 
-    const capacities =
-        getUniqueCapacities();
+    const combinations =
+        getACCombinations();
+
+
+    if (
+        combinations.length === 0
+    ) {
+
+        container.innerHTML = `
+
+            <div class="empty-message">
+
+                No AC equipment combinations were found.
+
+            </div>
+
+        `;
+
+        return;
+    }
 
 
     container.innerHTML =
 
-        capacities
+        combinations
 
-            .map(capacity => {
+            .map(item => {
 
                 const existing =
+
                     quotation.acPrices.find(
-                        item =>
-                            item.capacity ===
-                            capacity
+                        priceItem =>
+                            priceItem.key ===
+                            item.key
                     );
 
 
@@ -1704,10 +2250,38 @@ function renderACPriceInputs() {
 
                         <h3>
 
-                            ${capacity.toLocaleString()}
+                            ${escapeHTML(item.brand)}
+
+                            ${Number(
+                                item.capacity
+                            ).toLocaleString(
+                                "en-KE"
+                            )}
+
                             BTU/hr
 
+                            ${escapeHTML(item.type)}
+
                         </h3>
+
+
+                        <p>
+
+                            Room(s):
+
+                            <strong>
+
+                                ${
+                                    item.rooms
+                                        .map(
+                                            escapeHTML
+                                        )
+                                        .join(", ")
+                                }
+
+                            </strong>
+
+                        </p>
 
 
                         <p>
@@ -1715,9 +2289,9 @@ function renderACPriceInputs() {
                             Quantity:
 
                             <strong>
-                                ${getCapacityQuantity(
-                                    capacity
-                                )}
+
+                                ${item.quantity}
+
                             </strong>
 
                         </p>
@@ -1732,12 +2306,14 @@ function renderACPriceInputs() {
                                 min="0"
                                 step="0.01"
                                 class="ac-price-input"
-                                data-capacity="${capacity}"
+                                data-key="${escapeHTML(item.key)}"
+
                                 value="${
                                     existing
                                         ? existing.unitPrice
                                         : ""
                                 }"
+
                                 placeholder="Enter unit price"
                             >
 
@@ -1771,12 +2347,14 @@ function saveACPrices() {
     const prices = [];
 
 
+    const combinations =
+        getACCombinations();
+
+
     inputs.forEach(input => {
 
-        const capacity =
-            Number(
-                input.dataset.capacity
-            );
+        const key =
+            input.dataset.key;
 
 
         const unitPrice =
@@ -1796,22 +2374,31 @@ function saveACPrices() {
         }
 
 
-        const quantity =
-            getCapacityQuantity(
-                capacity
+        const combination =
+
+            combinations.find(
+                item =>
+                    item.key === key
             );
+
+
+        if (!combination) {
+
+            valid = false;
+
+            return;
+        }
 
 
         prices.push({
 
-            capacity,
-
-            quantity,
+            ...combination,
 
             unitPrice,
 
             total:
-                quantity *
+
+                combination.quantity *
                 unitPrice
 
         });
@@ -1819,10 +2406,14 @@ function saveACPrices() {
     });
 
 
-    if (!valid) {
+    if (
+        !valid ||
+        prices.length !==
+        combinations.length
+    ) {
 
         alert(
-            "Please enter a valid price for every AC capacity."
+            "Please enter a valid price for every AC combination."
         );
 
         return;
@@ -1837,116 +2428,207 @@ function saveACPrices() {
 }
 
 
-
 /* =========================================================
-   STEP 10
-   INSTALLATION COMMISSIONING COST
+   INSTALLATION COMMISSIONING RATES
    ========================================================= */
 
 const INSTALLATION_RATES = {
+
     "Mombasa Region": {
+
         "HIGHWALL": 6500,
+
         "CASSETTE": 8500,
+
         "DUCTABLE": 10500,
+
         "FLOOR STANDING": 10500
+
     },
+
 
     "Kilifi County Up to Kilifi Town": {
+
         "HIGHWALL": 10500,
+
         "CASSETTE": 10500,
+
         "DUCTABLE": 13000,
+
         "FLOOR STANDING": 12500
+
     },
+
 
     "Kilifi County After Kilifi Town": {
+
         "HIGHWALL": 12500,
+
         "CASSETTE": 12500,
+
         "DUCTABLE": 14000,
+
         "FLOOR STANDING": 13500
+
     },
+
 
     "Kwale County Up to Ukunda": {
+
         "HIGHWALL": 10500,
+
         "CASSETTE": 10500,
+
         "DUCTABLE": 13000,
+
         "FLOOR STANDING": 12500
+
     },
+
 
     "Kwale County After Ukunda": {
+
         "HIGHWALL": 12500,
+
         "CASSETTE": 12500,
+
         "DUCTABLE": 14000,
+
         "FLOOR STANDING": 13500
+
     },
+
 
     "Taita Taveta County": {
+
         "HIGHWALL": 14500,
+
         "CASSETTE": 14500,
+
         "DUCTABLE": 18000,
+
         "FLOOR STANDING": 17500
+
     },
+
 
     "Tana River County": {
+
         "HIGHWALL": 14500,
+
         "CASSETTE": 14500,
+
         "DUCTABLE": 19000,
+
         "FLOOR STANDING": 18500
+
     },
 
+
     "Lamu County": {
+
         "HIGHWALL": 17000,
+
         "CASSETTE": 17000,
+
         "DUCTABLE": 21000,
+
         "FLOOR STANDING": 20500
+
     }
+
 };
 
 
+/* =========================================================
+   GET TOTAL NUMBER OF AC UNITS
+   ========================================================= */
+
 function getTotalACUnits() {
 
-    return quotation.acPrices.reduce(
-        (sum, item) =>
+    return quotation.rooms.reduce(
+        (sum, room) =>
+
             sum +
-            Number(item.quantity || 0),
+
+            (
+                Array.isArray(
+                    room.acUnits
+                )
+
+                    ? room.acUnits.length
+                    : 0
+            ),
         0
     );
 }
 
+
+/* =========================================================
+   GET INSTALLATION UNIT COST
+   ========================================================= */
 
 function getInstallationUnitCost() {
 
     const region =
         quotation.installationRegion;
 
+
     const type =
         quotation.acType;
 
+
     return (
-        INSTALLATION_RATES[region]?.[type] ||
-        0
+
+        INSTALLATION_RATES[
+            region
+        ]?.[
+            type
+        ] || 0
+
     );
 }
 
+
+/* =========================================================
+   GET INSTALLATION TOTAL
+   ========================================================= */
 
 function getInstallationTotal() {
 
     return (
-        Number(quotation.installationUnitCount || 0) *
-        Number(quotation.installationUnitCost || 0)
+
+        Number(
+            quotation.installationUnitCount ||
+            0
+        ) *
+
+        Number(
+            quotation.installationUnitCost ||
+            0
+        )
+
     );
 }
 
 
+/* =========================================================
+   RENDER INSTALLATION COST PAGE
+   ========================================================= */
+
 function renderInstallationCostPage() {
 
     /*
-       Page 11 originally contained the Additional Items
-       interface. We replace only its contents so no HTML
-       page-file changes are required.
+       Page 11 originally contained the additional-items
+       interface. Its contents are replaced by the
+       installation commissioning interface.
     */
 
     const page =
-        document.getElementById("page11");
+        document.getElementById(
+            "page11"
+        );
+
 
     if (!page) return;
 
@@ -1959,51 +2641,78 @@ function renderInstallationCostPage() {
                 Installation Commissioning Cost
             </h2>
 
+
             <p class="info-box">
+
                 Select the installation region and AC type.
-                The installation cost per unit is selected
+
+                The installation cost per unit will be selected
                 automatically from the approved rate table.
+
             </p>
 
+
             <label>
+
                 Installation Region
 
                 <select id="installationRegion">
+
                     <option value="">
                         Select installation region
                     </option>
 
-                    ${Object.keys(INSTALLATION_RATES)
-                        .map(region => `
-                            <option
-                                value="${escapeHTML(region)}"
-                                ${
-                                    quotation.installationRegion === region
-                                        ? "selected"
-                                        : ""
-                                }
-                            >
-                                ${escapeHTML(region)}
-                            </option>
-                        `)
-                        .join("")
+                    ${
+                        Object.keys(
+                            INSTALLATION_RATES
+                        )
+
+                            .map(region => `
+
+                                <option
+                                    value="${escapeHTML(region)}"
+
+                                    ${
+                                        quotation.installationRegion ===
+                                        region
+
+                                            ? "selected"
+                                            : ""
+                                    }
+                                >
+
+                                    ${escapeHTML(region)}
+
+                                </option>
+
+                            `)
+
+                            .join("")
                     }
+
                 </select>
+
             </label>
 
 
             <label>
-                Type of AC
+
+                Installation AC Type
 
                 <select id="acType">
+
                     <option value="">
-                        Select AC type
+                        Select installation AC type
                     </option>
+
 
                     <option
                         value="HIGHWALL"
+
                         ${
-                            quotation.acType === "HIGHWALL"
+                            quotation.acType ===
+                            "HIGHWALL"
+
                                 ? "selected"
                                 : ""
                         }
@@ -2011,10 +2720,14 @@ function renderInstallationCostPage() {
                         HIGHWALL
                     </option>
 
+
                     <option
                         value="CASSETTE"
+
                         ${
-                            quotation.acType === "CASSETTE"
+                            quotation.acType ===
+                            "CASSETTE"
+
                                 ? "selected"
                                 : ""
                         }
@@ -2022,10 +2735,14 @@ function renderInstallationCostPage() {
                         CASSETTE
                     </option>
 
+
                     <option
                         value="DUCTABLE"
+
                         ${
-                            quotation.acType === "DUCTABLE"
+                            quotation.acType ===
+                            "DUCTABLE"
+
                                 ? "selected"
                                 : ""
                         }
@@ -2033,17 +2750,23 @@ function renderInstallationCostPage() {
                         DUCTABLE
                     </option>
 
+
                     <option
                         value="FLOOR STANDING"
+
                         ${
-                            quotation.acType === "FLOOR STANDING"
+                            quotation.acType ===
+                            "FLOOR STANDING"
+
                                 ? "selected"
                                 : ""
                         }
                     >
                         FLOOR STANDING
                     </option>
+
                 </select>
+
             </label>
 
 
@@ -2055,7 +2778,9 @@ function renderInstallationCostPage() {
 
                 <br>
 
-                <span id="installationUnitCountDisplay">
+                <span
+                    id="installationUnitCountDisplay"
+                >
                     ${getTotalACUnits()}
                 </span>
 
@@ -2072,10 +2797,14 @@ function renderInstallationCostPage() {
 
                 <br>
 
-                <span id="installationUnitCostDisplay">
+                <span
+                    id="installationUnitCostDisplay"
+                >
+
                     ${money(
                         quotation.installationUnitCost
                     )}
+
                 </span>
 
             </div>
@@ -2089,10 +2818,14 @@ function renderInstallationCostPage() {
 
                 <br>
 
-                <span id="installationTotalDisplay">
+                <span
+                    id="installationTotalDisplay"
+                >
+
                     ${money(
                         quotation.installationTotal
                     )}
+
                 </span>
 
             </div>
@@ -2103,7 +2836,7 @@ function renderInstallationCostPage() {
                 class="secondary-button full-width"
                 onclick="saveInstallationCosts()"
             >
-                Continue to Material Rates →
+                Continue to Accessories →
             </button>
 
         </div>
@@ -2116,6 +2849,7 @@ function renderInstallationCostPage() {
             "installationRegion"
         );
 
+
     const typeSelect =
         document.getElementById(
             "acType"
@@ -2125,33 +2859,48 @@ function renderInstallationCostPage() {
     function updateInstallationPreview() {
 
         const region =
-            regionSelect?.value || "";
+            regionSelect?.value ||
+            "";
+
 
         const type =
-            typeSelect?.value || "";
+            typeSelect?.value ||
+            "";
+
 
         const unitCount =
             getTotalACUnits();
 
+
         const unitCost =
-            INSTALLATION_RATES[region]?.[type] ||
-            0;
+
+            INSTALLATION_RATES[
+                region
+            ]?.[
+                type
+            ] || 0;
+
 
         const total =
-            unitCount * unitCost;
+            unitCount *
+            unitCost;
 
 
         quotation.installationRegion =
             region;
 
+
         quotation.acType =
             type;
+
 
         quotation.installationUnitCount =
             unitCount;
 
+
         quotation.installationUnitCost =
             unitCost;
+
 
         quotation.installationTotal =
             total;
@@ -2162,10 +2911,12 @@ function renderInstallationCostPage() {
                 "installationUnitCountDisplay"
             );
 
+
         const costOutput =
             document.getElementById(
                 "installationUnitCostDisplay"
             );
+
 
         const totalOutput =
             document.getElementById(
@@ -2174,18 +2925,26 @@ function renderInstallationCostPage() {
 
 
         if (countOutput) {
+
             countOutput.textContent =
                 unitCount;
+
         }
+
 
         if (costOutput) {
+
             costOutput.textContent =
                 money(unitCost);
+
         }
 
+
         if (totalOutput) {
+
             totalOutput.textContent =
                 money(total);
+
         }
     }
 
@@ -2194,6 +2953,7 @@ function renderInstallationCostPage() {
         "change",
         updateInstallationPreview
     );
+
 
     typeSelect?.addEventListener(
         "change",
@@ -2205,16 +2965,26 @@ function renderInstallationCostPage() {
 }
 
 
+/* =========================================================
+   GO TO INSTALLATION COST PAGE
+   ========================================================= */
+
 function goToInstallationCosts() {
 
     quotation.installationUnitCount =
         getTotalACUnits();
 
+
     renderInstallationCostPage();
+
 
     showPage(11);
 }
 
+
+/* =========================================================
+   SAVE INSTALLATION COSTS
+   ========================================================= */
 
 function saveInstallationCosts() {
 
@@ -2222,6 +2992,7 @@ function saveInstallationCosts() {
         document.getElementById(
             "installationRegion"
         )?.value || "";
+
 
     const type =
         document.getElementById(
@@ -2242,7 +3013,7 @@ function saveInstallationCosts() {
     if (!type) {
 
         alert(
-            "Please select the AC type."
+            "Please select the installation AC type."
         );
 
         return;
@@ -2252,9 +3023,14 @@ function saveInstallationCosts() {
     const unitCount =
         getTotalACUnits();
 
+
     const unitCost =
-        INSTALLATION_RATES[region]?.[type] ||
-        0;
+
+        INSTALLATION_RATES[
+            region
+        ]?.[
+            type
+        ] || 0;
 
 
     if (
@@ -2273,32 +3049,32 @@ function saveInstallationCosts() {
     quotation.installationRegion =
         region;
 
+
     quotation.acType =
         type;
+
 
     quotation.installationUnitCount =
         unitCount;
 
+
     quotation.installationUnitCost =
         unitCost;
 
+
     quotation.installationTotal =
-        unitCount * unitCost;
+        unitCount *
+        unitCost;
 
-
-    /*
-       Page 12 is the Additional Works page.
-       Installation Commissioning is shown first, followed by user-added items.
-    */
 
     renderAdditionalItems();
+
 
     showPage(12);
 }
 
 
 /* =========================================================
-   STEP 11
    MATERIAL RATES
    ========================================================= */
 
@@ -2335,6 +3111,10 @@ function goToMaterialRates() {
     showPage(10);
 }
 
+
+/* =========================================================
+   SAVE MATERIAL RATES
+   ========================================================= */
 
 function saveMaterialRates() {
 
@@ -2393,16 +3173,14 @@ function saveMaterialRates() {
 
 /* =========================================================
    SECTION 4 OF 7
-   ADDITIONAL ITEMS
-
-PRELIMINARIES
-   AS-BUILT DRAWING
+   INSTALLATION ACCESSORIES + ADDITIONAL ITEMS
+   PRELIMINARIES + AS-BUILT DRAWING
    ========================================================= */
 
 
 /* =========================================================
    STEP 12
-   ADDITIONAL ITEMS
+   INSTALLATION COMMISSIONING & ACCESSORIES
    ========================================================= */
 
 function renderAdditionalItems() {
@@ -2417,6 +3195,106 @@ function renderAdditionalItems() {
 
 
     container.innerHTML = `
+
+        <!-- ===============================================
+             INSTALLATION COMMISSIONING
+        ================================================ -->
+
+        <div class="card">
+
+            <h3>
+                Installation Commissioning
+            </h3>
+
+
+            <p>
+
+                Installation Region:
+
+                <strong>
+
+                    ${
+                        escapeHTML(
+                            quotation.installationRegion ||
+                            "Not selected"
+                        )
+                    }
+
+                </strong>
+
+            </p>
+
+
+            <p>
+
+                Installation AC Type:
+
+                <strong>
+
+                    ${
+                        escapeHTML(
+                            quotation.acType ||
+                            "Not selected"
+                        )
+                    }
+
+                </strong>
+
+            </p>
+
+
+            <p>
+
+                Number of AC Units:
+
+                <strong>
+
+                    ${
+                        Number(
+                            quotation.installationUnitCount
+                        ) || 0
+                    }
+
+                </strong>
+
+            </p>
+
+
+            <p>
+
+                Installation Cost Per Unit:
+
+                <strong>
+
+                    ${
+                        money(
+                            quotation.installationUnitCost
+                        )
+                    }
+
+                </strong>
+
+            </p>
+
+
+            <div class="info-box">
+
+                Total Installation Cost:
+
+                <strong>
+
+                    ${
+                        money(
+                            getInstallationCommissioningTotal()
+                        )
+                    }
+
+                </strong>
+
+            </div>
+
+        </div>
+
 
         <!-- ===============================================
              ADDITIONAL ITEM ENTRY
@@ -2530,6 +3408,7 @@ function renderAdditionalItems() {
                 <input
                     type="checkbox"
                     id="includePreliminaries"
+
                     ${
                         quotation.includePreliminaries
                             ? "checked"
@@ -2544,6 +3423,7 @@ function renderAdditionalItems() {
 
             <div
                 id="preliminariesCostContainer"
+
                 style="
                     display:${
                         quotation.includePreliminaries
@@ -2562,6 +3442,7 @@ function renderAdditionalItems() {
                         id="preliminariesCost"
                         min="0"
                         step="0.01"
+
                         value="${
                             quotation.preliminariesCost
                         }"
@@ -2590,6 +3471,7 @@ function renderAdditionalItems() {
                 <input
                     type="checkbox"
                     id="includeAsBuiltDrawing"
+
                     ${
                         quotation.includeAsBuiltDrawing
                             ? "checked"
@@ -2604,6 +3486,7 @@ function renderAdditionalItems() {
 
             <div
                 id="asBuiltDrawingCostContainer"
+
                 style="
                     display:${
                         quotation.includeAsBuiltDrawing
@@ -2622,6 +3505,7 @@ function renderAdditionalItems() {
                         id="asBuiltDrawingCost"
                         min="0"
                         step="0.01"
+
                         value="${
                             quotation.asBuiltDrawingCost
                         }"
@@ -2651,7 +3535,7 @@ function renderAdditionalItems() {
 
     /* =====================================================
        ADDITIONAL ITEM LIVE CALCULATION
-    ===================================================== */
+       ===================================================== */
 
     document
         .getElementById(
@@ -2674,8 +3558,8 @@ function renderAdditionalItems() {
 
 
     /* =====================================================
-       PRELIMINARIES
-    ===================================================== */
+       PRELIMINARIES CHECKBOX
+       ===================================================== */
 
     document
         .getElementById(
@@ -2689,18 +3573,19 @@ function renderAdditionalItems() {
                     this.checked;
 
 
-                const box =
+                const container =
                     document.getElementById(
                         "preliminariesCostContainer"
                     );
 
 
-                if (box) {
+                if (container) {
 
-                    box.style.display =
+                    container.style.display =
                         this.checked
                             ? "block"
                             : "none";
+
                 }
 
             }
@@ -2716,15 +3601,17 @@ function renderAdditionalItems() {
             function () {
 
                 quotation.preliminariesCost =
-                    Number(this.value) || 0;
+                    Number(
+                        this.value
+                    ) || 0;
 
             }
         );
 
 
     /* =====================================================
-       AS-BUILT DRAWING
-    ===================================================== */
+       AS-BUILT DRAWING CHECKBOX
+       ===================================================== */
 
     document
         .getElementById(
@@ -2738,18 +3625,19 @@ function renderAdditionalItems() {
                     this.checked;
 
 
-                const box =
+                const container =
                     document.getElementById(
                         "asBuiltDrawingCostContainer"
                     );
 
 
-                if (box) {
+                if (container) {
 
-                    box.style.display =
+                    container.style.display =
                         this.checked
                             ? "block"
                             : "none";
+
                 }
 
             }
@@ -2765,7 +3653,9 @@ function renderAdditionalItems() {
             function () {
 
                 quotation.asBuiltDrawingCost =
-                    Number(this.value) || 0;
+                    Number(
+                        this.value
+                    ) || 0;
 
             }
         );
@@ -2776,12 +3666,12 @@ function renderAdditionalItems() {
 
 
 /* =========================================================
-   CALCULATE ADDITIONAL ITEM
+   CALCULATE ADDITIONAL ITEM TOTAL
    ========================================================= */
 
 function calculateExtraItem() {
 
-    const qty =
+    const quantity =
         Number(
             document.getElementById(
                 "extraItemQty"
@@ -2789,7 +3679,7 @@ function calculateExtraItem() {
         );
 
 
-    const price =
+    const unitPrice =
         Number(
             document.getElementById(
                 "extraItemPrice"
@@ -2798,7 +3688,8 @@ function calculateExtraItem() {
 
 
     const total =
-        qty * price;
+        quantity *
+        unitPrice;
 
 
     const output =
@@ -2860,7 +3751,7 @@ function saveExtraItem() {
     ) {
 
         alert(
-            "Please enter item name, quantity and valid unit price."
+            "Please enter the item name, quantity and a valid unit price."
         );
 
         return;
@@ -2884,30 +3775,70 @@ function saveExtraItem() {
     });
 
 
-    document.getElementById(
-        "extraItemName"
-    ).value = "";
+    const nameInput =
+        document.getElementById(
+            "extraItemName"
+        );
 
 
-    document.getElementById(
-        "extraItemQty"
-    ).value = "";
+    const quantityInput =
+        document.getElementById(
+            "extraItemQty"
+        );
 
 
-    document.getElementById(
-        "extraItemUnit"
-    ).value = "";
+    const unitInput =
+        document.getElementById(
+            "extraItemUnit"
+        );
 
 
-    document.getElementById(
-        "extraItemPrice"
-    ).value = "";
+    const priceInput =
+        document.getElementById(
+            "extraItemPrice"
+        );
 
 
-    document.getElementById(
-        "extraItemTotal"
-    ).textContent =
-        "KES 0.00";
+    const totalOutput =
+        document.getElementById(
+            "extraItemTotal"
+        );
+
+
+    if (nameInput) {
+
+        nameInput.value = "";
+
+    }
+
+
+    if (quantityInput) {
+
+        quantityInput.value = "";
+
+    }
+
+
+    if (unitInput) {
+
+        unitInput.value = "";
+
+    }
+
+
+    if (priceInput) {
+
+        priceInput.value = "";
+
+    }
+
+
+    if (totalOutput) {
+
+        totalOutput.textContent =
+            "KES 0.00";
+
+    }
 
 
     renderAdditionalItemsPreview();
@@ -2929,71 +3860,60 @@ function renderAdditionalItemsPreview() {
     if (!container) return;
 
 
-    const installationCard = `
-
-        <div class="card">
-
-            <strong>
-                Installation Commissioning
-            </strong>
-
-            <p>
-                ${number(quotation.installationUnitCount)} units
-
-                ×
-
-                ${money(quotation.installationUnitCost)}
-            </p>
-
-            <p>
-                Total:
-
-                <strong>
-                    ${money(getInstallationCommissioningTotal())}
-                </strong>
-            </p>
-
-            <div class="info-box">
-                Installation Commissioning is automatically calculated
-                and is always listed first under Additional Works.
-            </div>
-
-        </div>
-
-    `;
-
-
     const additionalCards =
+
         quotation.additionalItems.length === 0
+
             ? `
+
                 <div class="empty-message">
-                    No other additional items added.
+
+                    No other accessories or additional items added.
+
                 </div>
+
             `
+
             : quotation.additionalItems
+
                 .map(
                     (item, index) => `
 
                         <div class="card">
 
                             <strong>
+
                                 ${index + 1}.
                                 ${escapeHTML(item.name)}
+
                             </strong>
 
-                            <p>
-                                ${number(item.quantity)}
-                                ${escapeHTML(item.unit)}
-                                ×
-                                ${money(item.unitPrice)}
-                            </p>
 
                             <p>
-                                Total:
-                                <strong>
-                                    ${money(item.total)}
-                                </strong>
+
+                                ${number(item.quantity)}
+
+                                ${escapeHTML(item.unit)}
+
+                                ×
+
+                                ${money(item.unitPrice)}
+
                             </p>
+
+
+                            <p>
+
+                                Total:
+
+                                <strong>
+
+                                    ${money(item.total)}
+
+                                </strong>
+
+                            </p>
+
 
                             <button
                                 type="button"
@@ -3007,14 +3927,18 @@ function renderAdditionalItemsPreview() {
 
                     `
                 )
+
                 .join("");
 
 
     container.innerHTML =
-        installationCard +
         additionalCards;
 }
 
+
+/* =========================================================
+   DELETE ADDITIONAL ITEM
+   ========================================================= */
 
 function deleteAdditionalItem(index) {
 
@@ -3048,18 +3972,17 @@ function deleteAdditionalItem(index) {
 
 /* =========================================================
    FINISH ADDITIONAL ITEMS
-   → CLIENT DETAILS
    ========================================================= */
 
 function finishAdditionalItems() {
 
-    const prelimCheckbox =
+    const preliminariesCheckbox =
         document.getElementById(
             "includePreliminaries"
         );
 
 
-    const prelimCost =
+    const preliminariesCostInput =
         document.getElementById(
             "preliminariesCost"
         );
@@ -3067,13 +3990,13 @@ function finishAdditionalItems() {
 
     quotation.includePreliminaries =
         Boolean(
-            prelimCheckbox?.checked
+            preliminariesCheckbox?.checked
         );
 
 
     quotation.preliminariesCost =
         Number(
-            prelimCost?.value
+            preliminariesCostInput?.value
         ) || 0;
 
 
@@ -3083,7 +4006,7 @@ function finishAdditionalItems() {
         );
 
 
-    const asBuiltCost =
+    const asBuiltCostInput =
         document.getElementById(
             "asBuiltDrawingCost"
         );
@@ -3097,15 +4020,39 @@ function finishAdditionalItems() {
 
     quotation.asBuiltDrawingCost =
         Number(
-            asBuiltCost?.value
+            asBuiltCostInput?.value
         ) || 0;
 
 
-    /*
-       IMPORTANT:
-       Do NOT render quotation preview here.
+    if (
+        quotation.includePreliminaries &&
+        quotation.preliminariesCost < 0
+    ) {
 
-       Client details must come first.
+        alert(
+            "Please enter a valid preliminaries cost."
+        );
+
+        return;
+    }
+
+
+    if (
+        quotation.includeAsBuiltDrawing &&
+        quotation.asBuiltDrawingCost < 0
+    ) {
+
+        alert(
+            "Please enter a valid as-built drawing cost."
+        );
+
+        return;
+    }
+
+
+    /*
+       Client details must be completed before the final
+       quotation preview is rendered.
     */
 
     showPage(13);
@@ -3113,13 +4060,12 @@ function finishAdditionalItems() {
 
 /* =========================================================
    SECTION 5 OF 7
-   TOTALS + CLIENT DETAILS + FINAL PREVIEW
-
+   TOTALS + CLIENT DETAILS + FINAL QUOTATION PREVIEW
    ========================================================= */
 
 
 /* =========================================================
-   TOTALS
+   EQUIPMENT TOTAL
    ========================================================= */
 
 function getEquipmentTotal() {
@@ -3139,6 +4085,10 @@ function getEquipmentTotal() {
 }
 
 
+/* =========================================================
+   COPPER TOTAL
+   ========================================================= */
+
 function getCopperTotal() {
 
     return (
@@ -3152,6 +4102,10 @@ function getCopperTotal() {
     );
 }
 
+
+/* =========================================================
+   DRAINAGE TOTAL
+   ========================================================= */
 
 function getDrainageTotal() {
 
@@ -3167,6 +4121,10 @@ function getDrainageTotal() {
 }
 
 
+/* =========================================================
+   INSTALLATION COMMISSIONING TOTAL
+   ========================================================= */
+
 function getInstallationCommissioningTotal() {
 
     return Number(
@@ -3174,6 +4132,10 @@ function getInstallationCommissioningTotal() {
     );
 }
 
+
+/* =========================================================
+   ADDITIONAL ITEMS TOTAL
+   ========================================================= */
 
 function getAdditionalItemsTotal() {
 
@@ -3192,6 +4154,10 @@ function getAdditionalItemsTotal() {
 }
 
 
+/* =========================================================
+   PRELIMINARIES TOTAL
+   ========================================================= */
+
 function getPreliminariesTotal() {
 
     if (
@@ -3199,6 +4165,7 @@ function getPreliminariesTotal() {
     ) {
 
         return 0;
+
     }
 
 
@@ -3208,6 +4175,10 @@ function getPreliminariesTotal() {
 }
 
 
+/* =========================================================
+   AS-BUILT DRAWING TOTAL
+   ========================================================= */
+
 function getAsBuiltDrawingTotal() {
 
     if (
@@ -3215,6 +4186,7 @@ function getAsBuiltDrawingTotal() {
     ) {
 
         return 0;
+
     }
 
 
@@ -3223,6 +4195,10 @@ function getAsBuiltDrawingTotal() {
     );
 }
 
+
+/* =========================================================
+   TOTAL HVAC WORKS
+   ========================================================= */
 
 function getHVACTotal() {
 
@@ -3242,6 +4218,10 @@ function getHVACTotal() {
 }
 
 
+/* =========================================================
+   QUOTATION SUBTOTAL
+   ========================================================= */
+
 function getQuotationSubtotal() {
 
     return (
@@ -3256,21 +4236,29 @@ function getQuotationSubtotal() {
 }
 
 
+/* =========================================================
+   VAT
+   ========================================================= */
+
 function getQuotationVAT() {
 
     return (
 
         getQuotationSubtotal() *
-
         0.16
 
     );
 }
 
 
+/* =========================================================
+   GRAND TOTAL
+   ========================================================= */
+
 function getQuotationGrandTotal() {
 
     return (
+
         getQuotationSubtotal() +
 
         getQuotationVAT()
@@ -3280,7 +4268,7 @@ function getQuotationGrandTotal() {
 
 
 /* =========================================================
-   CLIENT DETAILS
+   GET CLIENT DETAILS
    ========================================================= */
 
 function getClientDetails() {
@@ -3317,7 +4305,7 @@ function getClientDetails() {
 
 
 /* =========================================================
-   CLIENT DETAILS → FINAL PREVIEW
+   CLIENT DETAILS → QUOTATION PREVIEW
    ========================================================= */
 
 function proceedToQuotationPreview() {
@@ -3325,9 +4313,7 @@ function proceedToQuotationPreview() {
     getClientDetails();
 
 
-    if (
-        !quotation.clientName
-    ) {
+    if (!quotation.clientName) {
 
         alert(
             "Please enter the client name."
@@ -3337,9 +4323,7 @@ function proceedToQuotationPreview() {
     }
 
 
-    if (
-        !quotation.installationLocation
-    ) {
+    if (!quotation.installationLocation) {
 
         alert(
             "Please enter the installation location."
@@ -3387,10 +4371,6 @@ function renderQuotationPreview() {
         getInstallationCommissioningTotal();
 
 
-    const additional =
-        getAdditionalItemsTotal();
-
-
     const preliminaries =
         getPreliminariesTotal();
 
@@ -3415,7 +4395,7 @@ function renderQuotationPreview() {
 
         <!-- =================================================
              FINAL QUOTATION DOCUMENT
-             ================================================= -->
+        ================================================== -->
 
         <div
             class="quotation-document"
@@ -3427,7 +4407,9 @@ function renderQuotationPreview() {
             </h1>
 
 
-            <!-- CLIENT DETAILS -->
+            <!-- =============================================
+                 CLIENT DETAILS
+            ============================================== -->
 
             <div class="quotation-section">
 
@@ -3436,9 +4418,7 @@ function renderQuotationPreview() {
                 </h3>
 
 
-                <table
-                    class="client-table"
-                >
+                <table class="client-table">
 
                     <tbody>
 
@@ -3449,9 +4429,13 @@ function renderQuotationPreview() {
                             </td>
 
                             <td>
-                                ${escapeHTML(
-                                    quotation.clientName
-                                )}
+
+                                ${
+                                    escapeHTML(
+                                        quotation.clientName
+                                    )
+                                }
+
                             </td>
 
                         </tr>
@@ -3464,9 +4448,13 @@ function renderQuotationPreview() {
                             </td>
 
                             <td>
-                                ${escapeHTML(
-                                    quotation.installationLocation
-                                )}
+
+                                ${
+                                    escapeHTML(
+                                        quotation.installationLocation
+                                    )
+                                }
+
                             </td>
 
                         </tr>
@@ -3479,9 +4467,13 @@ function renderQuotationPreview() {
                             </td>
 
                             <td>
-                                ${escapeHTML(
-                                    quotation.salesPerson
-                                )}
+
+                                ${
+                                    escapeHTML(
+                                        quotation.salesPerson
+                                    )
+                                }
+
                             </td>
 
                         </tr>
@@ -3494,9 +4486,13 @@ function renderQuotationPreview() {
                             </td>
 
                             <td>
-                                ${escapeHTML(
-                                    quotation.salesPhone
-                                )}
+
+                                ${
+                                    escapeHTML(
+                                        quotation.salesPhone
+                                    )
+                                }
+
                             </td>
 
                         </tr>
@@ -3509,9 +4505,13 @@ function renderQuotationPreview() {
                             </td>
 
                             <td>
-                                ${escapeHTML(
-                                    quotation.salesEmail
-                                )}
+
+                                ${
+                                    escapeHTML(
+                                        quotation.salesEmail
+                                    )
+                                }
+
                             </td>
 
                         </tr>
@@ -3523,7 +4523,9 @@ function renderQuotationPreview() {
             </div>
 
 
-            <!-- EQUIPMENT -->
+            <!-- =============================================
+                 EQUIPMENT
+            ============================================== -->
 
             <div class="quotation-section">
 
@@ -3532,99 +4534,170 @@ function renderQuotationPreview() {
                 </h3>
 
 
-                <table>
+                <div style="overflow-x:auto">
 
-                    <thead>
+                    <table>
 
-                        <tr>
+                        <thead>
 
-                            <th>
-                                AC Capacity
-                            </th>
+                            <tr>
 
-                            <th class="number">
-                                Qty
-                            </th>
+                                <th>
+                                    Brand / Capacity / Type / Room(s)
+                                </th>
 
-                            <th class="number">
-                                Unit Price
-                            </th>
+                                <th class="number">
+                                    Qty
+                                </th>
 
-                            <th class="number">
-                                Total
-                            </th>
+                                <th class="number">
+                                    Unit Price
+                                </th>
 
-                        </tr>
+                                <th class="number">
+                                    Total
+                                </th>
 
-                    </thead>
+                            </tr>
 
-
-                    <tbody>
-
-                        ${
-                            quotation.acPrices
-                                .map(item => `
-
-                                    <tr>
-
-                                        <td>
-                                            ${Number(
-                                                item.capacity
-                                            ).toLocaleString()}
-                                            BTU/hr
-                                        </td>
-
-                                        <td class="number">
-                                            ${item.quantity}
-                                        </td>
-
-                                        <td class="number">
-                                            ${money(
-                                                item.unitPrice
-                                            )}
-                                        </td>
-
-                                        <td class="number">
-                                            ${money(
-                                                item.total
-                                            )}
-                                        </td>
-
-                                    </tr>
-
-                                `)
-                                .join("")
-                        }
+                        </thead>
 
 
-                        <tr>
+                        <tbody>
 
-                            <td colspan="3">
+                            ${
+                                quotation.acPrices
 
-                                <strong>
-                                    Equipment Total
-                                </strong>
+                                    .map(item => `
 
-                            </td>
+                                        <tr>
 
-                            <td class="number">
+                                            <td>
 
-                                <strong>
-                                    ${money(equipment)}
-                                </strong>
+                                                <strong>
 
-                            </td>
+                                                    ${
+                                                        escapeHTML(
+                                                            item.brand ||
+                                                            "LG"
+                                                        )
+                                                    }
 
-                        </tr>
+                                                    ${Number(
+                                                        item.capacity
+                                                    ).toLocaleString(
+                                                        "en-KE"
+                                                    )}
 
-                    </tbody>
+                                                    BTU/hr
 
-                </table>
+                                                </strong>
+
+                                                <br>
+
+                                                ${
+                                                    escapeHTML(
+                                                        item.type ||
+                                                        "HIGHWALL"
+                                                    )
+                                                }
+
+                                                <br>
+
+                                                <small>
+
+                                                    Room(s):
+
+                                                    ${
+                                                        Array.isArray(
+                                                            item.rooms
+                                                        )
+
+                                                            ? item.rooms
+                                                                .map(
+                                                                    escapeHTML
+                                                                )
+                                                                .join(", ")
+
+                                                            : ""
+                                                    }
+
+                                                </small>
+
+                                            </td>
+
+
+                                            <td class="number">
+
+                                                ${item.quantity}
+
+                                            </td>
+
+
+                                            <td class="number">
+
+                                                ${
+                                                    money(
+                                                        item.unitPrice
+                                                    )
+                                                }
+
+                                            </td>
+
+
+                                            <td class="number">
+
+                                                ${
+                                                    money(
+                                                        item.total
+                                                    )
+                                                }
+
+                                            </td>
+
+                                        </tr>
+
+                                    `)
+
+                                    .join("")
+                            }
+
+
+                            <tr>
+
+                                <td colspan="3">
+
+                                    <strong>
+                                        Equipment Total
+                                    </strong>
+
+                                </td>
+
+
+                                <td class="number">
+
+                                    <strong>
+
+                                        ${money(equipment)}
+
+                                    </strong>
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
 
             </div>
 
 
-            <!-- COPPER -->
+            <!-- =============================================
+                 COPPER AND ACCESSORIES
+            ============================================== -->
 
             <div class="quotation-section">
 
@@ -3633,68 +4706,85 @@ function renderQuotationPreview() {
                 </h3>
 
 
-                <table>
+                <div style="overflow-x:auto">
 
-                    <thead>
+                    <table>
 
-                        <tr>
+                        <thead>
 
-                            <th>
-                                Item
-                            </th>
+                            <tr>
 
-                            <th class="number">
-                                Quantity
-                            </th>
+                                <th>
+                                    Item
+                                </th>
 
-                            <th class="number">
-                                Unit Price
-                            </th>
+                                <th class="number">
+                                    Quantity
+                                </th>
 
-                            <th class="number">
-                                Total
-                            </th>
+                                <th class="number">
+                                    Unit Price
+                                </th>
 
-                        </tr>
+                                <th class="number">
+                                    Total
+                                </th>
 
-                    </thead>
+                            </tr>
+
+                        </thead>
 
 
-                    <tbody>
+                        <tbody>
 
-                        <tr>
+                            <tr>
 
-                            <td>
-                                Copper
-                            </td>
+                                <td>
+                                    Copper
+                                </td>
 
-                            <td class="number">
-                                ${number(
-                                    getTotalCopperLength()
-                                )}
-                                m
-                            </td>
+                                <td class="number">
 
-                            <td class="number">
-                                ${money(
-                                    quotation.copperRate
-                                )}
-                            </td>
+                                    ${
+                                        number(
+                                            getTotalCopperLength()
+                                        )
+                                    }
 
-                            <td class="number">
-                                ${money(copper)}
-                            </td>
+                                    m
 
-                        </tr>
+                                </td>
 
-                    </tbody>
+                                <td class="number">
 
-                </table>
+                                    ${
+                                        money(
+                                            quotation.copperRate
+                                        )
+                                    }
+
+                                </td>
+
+                                <td class="number">
+
+                                    ${money(copper)}
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
 
             </div>
 
 
-            <!-- DRAINAGE -->
+            <!-- =============================================
+                 DRAINAGE AND ACCESSORIES
+            ============================================== -->
 
             <div class="quotation-section">
 
@@ -3703,293 +4793,425 @@ function renderQuotationPreview() {
                 </h3>
 
 
-                <table>
+                <div style="overflow-x:auto">
 
-                    <thead>
+                    <table>
 
-                        <tr>
+                        <thead>
 
-                            <th>
-                                Item
-                            </th>
+                            <tr>
 
-                            <th class="number">
-                                Quantity
-                            </th>
+                                <th>
+                                    Item
+                                </th>
 
-                            <th class="number">
-                                Unit Price
-                            </th>
+                                <th class="number">
+                                    Quantity
+                                </th>
 
-                            <th class="number">
-                                Total
-                            </th>
+                                <th class="number">
+                                    Unit Price
+                                </th>
 
-                        </tr>
+                                <th class="number">
+                                    Total
+                                </th>
 
-                    </thead>
+                            </tr>
 
-
-                    <tbody>
-
-                        <tr>
-
-                            <td>
-                                Drainage
-                            </td>
-
-                            <td class="number">
-                                ${number(
-                                    getTotalDrainageLength()
-                                )}
-                                m
-                            </td>
-
-                            <td class="number">
-                                ${money(
-                                    quotation.drainageRate
-                                )}
-                            </td>
-
-                            <td class="number">
-                                ${money(drainage)}
-                            </td>
-
-                        </tr>
-
-                    </tbody>
-
-                </table>
-
-            </div>
+                        </thead>
 
 
-            <!-- ADDITIONAL WORKS -->
+                        <tbody>
 
-            <div class="quotation-section">
+                            <tr>
 
-                <h3>
-                    4. ADDITIONAL WORKS
-                </h3>
+                                <td>
+                                    Drainage
+                                </td>
 
+                                <td class="number">
 
-                <table>
+                                    ${
+                                        number(
+                                            getTotalDrainageLength()
+                                        )
+                                    }
 
-                    <thead>
+                                    m
 
-                        <tr>
+                                </td>
 
-                            <th>
-                                Item
-                            </th>
+                                <td class="number">
 
-                            <th class="number">
-                                Quantity
-                            </th>
+                                    ${
+                                        money(
+                                            quotation.drainageRate
+                                        )
+                                    }
 
-                            <th class="number">
-                                Unit Price
-                            </th>
+                                </td>
 
-                            <th class="number">
-                                Total
-                            </th>
+                                <td class="number">
 
-                        </tr>
+                                    ${money(drainage)}
 
-                    </thead>
+                                </td>
 
+                            </tr>
 
-                    <tbody>
+                        </tbody>
 
-                        <tr>
+                    </table>
 
-                            <td>
-                                Installation Commissioning
-                            </td>
-
-                            <td class="number">
-                                ${number(quotation.installationUnitCount)} units
-                            </td>
-
-                            <td class="number">
-                                ${money(quotation.installationUnitCost)}
-                            </td>
-
-                            <td class="number">
-                                ${money(installation)}
-                            </td>
-
-                        </tr>
-
-
-                        ${
-                            quotation.additionalItems
-                                .map(item => `
-
-                                    <tr>
-
-                                        <td>
-                                            ${escapeHTML(item.name)}
-                                        </td>
-
-                                        <td class="number">
-                                            ${number(item.quantity)}
-                                            ${escapeHTML(item.unit)}
-                                        </td>
-
-                                        <td class="number">
-                                            ${money(item.unitPrice)}
-                                        </td>
-
-                                        <td class="number">
-                                            ${money(item.total)}
-                                        </td>
-
-                                    </tr>
-
-                                `)
-                                .join("")
-                        }
-
-                    </tbody>
-
-                </table>
+                </div>
 
             </div>
 
 
-            <!-- SUMMARY -->
+            <!-- =============================================
+                 INSTALLATION COMMISSIONING & ACCESSORIES
+            ============================================== -->
 
             <div class="quotation-section">
 
                 <h3>
-                    SUMMARY
+                    4. INSTALLATION COMMISSIONING & ACCESSORIES
                 </h3>
 
 
-                <table>
+                <div style="overflow-x:auto">
 
-                    <thead>
+                    <table>
 
-                        <tr>
+                        <thead>
 
-                            <th>
-                                Description
-                            </th>
+                            <tr>
 
-                            <th class="number">
-                                Qty
-                            </th>
+                                <th>
+                                    Item
+                                </th>
 
-                            <th class="number">
-                                Unit Price
-                            </th>
+                                <th class="number">
+                                    Quantity
+                                </th>
 
-                            <th class="number">
-                                Total
-                            </th>
+                                <th class="number">
+                                    Unit Price
+                                </th>
 
-                        </tr>
+                                <th class="number">
+                                    Total
+                                </th>
 
-                    </thead>
+                            </tr>
 
-
-                    <tbody>
-
-                        <tr>
-
-                            <td>
-                                Total HVAC Works
-                            </td>
-
-                            <td class="number">
-                                1 lot
-                            </td>
-
-                            <td class="number">
-                                ${money(
-                                    getHVACTotal()
-                                )}
-                            </td>
-
-                            <td class="number">
-                                ${money(
-                                    getHVACTotal()
-                                )}
-                            </td>
-
-                        </tr>
+                        </thead>
 
 
-                        ${
-                            quotation.includePreliminaries
-                                ? `
+                        <tbody>
 
-                                    <tr>
+                            <tr>
 
-                                        <td>
-                                            Preliminaries
-                                        </td>
+                                <td>
 
-                                        <td class="number">
-                                            1 lot
-                                        </td>
+                                    Installation Commissioning
 
-                                        <td class="number">
-                                            ${money(
-                                                quotation.preliminariesCost
-                                            )}
-                                        </td>
+                                    <br>
 
-                                        <td class="number">
-                                            ${money(
-                                                preliminaries
-                                            )}
-                                        </td>
+                                    <small>
 
-                                    </tr>
+                                        ${
+                                            escapeHTML(
+                                                quotation.installationRegion
+                                            )
+                                        }
 
-                                `
-                                : ""
-                        }
+                                        —
+
+                                        ${
+                                            escapeHTML(
+                                                quotation.acType
+                                            )
+                                        }
+
+                                    </small>
+
+                                </td>
 
 
-                        ${
-                            quotation.includeAsBuiltDrawing
-                                ? `
+                                <td class="number">
 
-                                    <tr>
+                                    ${
+                                        number(
+                                            quotation.installationUnitCount
+                                        )
+                                    }
 
-                                        <td>
-                                            As-Built Drawing
-                                        </td>
+                                    units
 
-                                        <td class="number">
-                                            1 lot
-                                        </td>
+                                </td>
 
-                                        <td class="number">
-                                            ${money(
-                                                quotation.asBuiltDrawingCost
-                                            )}
-                                        </td>
 
-                                        <td class="number">
-                                            ${money(
-                                                asBuilt
-                                            )}
-                                        </td>
+                                <td class="number">
 
-                                    </tr>
+                                    ${
+                                        money(
+                                            quotation.installationUnitCost
+                                        )
+                                    }
 
-                                `
-                                : ""
-                        }
+                                </td>
 
-                    </tbody>
 
-                </table>
+                                <td class="number">
+
+                                    ${money(installation)}
+
+                                </td>
+
+                            </tr>
+
+
+                            ${
+                                quotation.additionalItems
+
+                                    .map(item => `
+
+                                        <tr>
+
+                                            <td>
+
+                                                ${
+                                                    escapeHTML(
+                                                        item.name
+                                                    )
+                                                }
+
+                                            </td>
+
+
+                                            <td class="number">
+
+                                                ${
+                                                    number(
+                                                        item.quantity
+                                                    )
+                                                }
+
+                                                ${
+                                                    escapeHTML(
+                                                        item.unit
+                                                    )
+                                                }
+
+                                            </td>
+
+
+                                            <td class="number">
+
+                                                ${
+                                                    money(
+                                                        item.unitPrice
+                                                    )
+                                                }
+
+                                            </td>
+
+
+                                            <td class="number">
+
+                                                ${
+                                                    money(
+                                                        item.total
+                                                    )
+                                                }
+
+                                            </td>
+
+                                        </tr>
+
+                                    `)
+
+                                    .join("")
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 QUOTATION SUMMARY
+            ============================================== -->
+
+            <div class="quotation-section">
+
+                <h3>
+                    QUOTATION SUMMARY
+                </h3>
+
+
+                <div style="overflow-x:auto">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Description
+                                </th>
+
+                                <th class="number">
+                                    Quantity
+                                </th>
+
+                                <th class="number">
+                                    Unit Price
+                                </th>
+
+                                <th class="number">
+                                    Total
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            <tr>
+
+                                <td>
+                                    Total HVAC Works
+                                </td>
+
+                                <td class="number">
+                                    1 lot
+                                </td>
+
+                                <td class="number">
+
+                                    ${
+                                        money(
+                                            getHVACTotal()
+                                        )
+                                    }
+
+                                </td>
+
+                                <td class="number">
+
+                                    ${
+                                        money(
+                                            getHVACTotal()
+                                        )
+                                    }
+
+                                </td>
+
+                            </tr>
+
+
+                            ${
+                                quotation.includePreliminaries
+
+                                    ? `
+
+                                        <tr>
+
+                                            <td>
+                                                Preliminaries
+                                            </td>
+
+                                            <td class="number">
+                                                1 lot
+                                            </td>
+
+                                            <td class="number">
+
+                                                ${
+                                                    money(
+                                                        quotation
+                                                            .preliminariesCost
+                                                    )
+                                                }
+
+                                            </td>
+
+                                            <td class="number">
+
+                                                ${
+                                                    money(
+                                                        preliminaries
+                                                    )
+                                                }
+
+                                            </td>
+
+                                        </tr>
+
+                                    `
+
+                                    : ""
+                            }
+
+
+                            ${
+                                quotation.includeAsBuiltDrawing
+
+                                    ? `
+
+                                        <tr>
+
+                                            <td>
+                                                As-Built Drawing
+                                            </td>
+
+                                            <td class="number">
+                                                1 lot
+                                            </td>
+
+                                            <td class="number">
+
+                                                ${
+                                                    money(
+                                                        quotation
+                                                            .asBuiltDrawingCost
+                                                    )
+                                                }
+
+                                            </td>
+
+                                            <td class="number">
+
+                                                ${
+                                                    money(
+                                                        asBuilt
+                                                    )
+                                                }
+
+                                            </td>
+
+                                        </tr>
+
+                                    `
+
+                                    : ""
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
 
 
                 <div
@@ -3999,15 +5221,15 @@ function renderQuotationPreview() {
                 >
 
                     <p
-
-style="
+                        style="
                             display:flex;
                             justify-content:space-between;
+                            gap:15px;
                         "
                     >
 
                         <span>
-                            Total before VAT:
+                            Total Before VAT:
                         </span>
 
                         <strong>
@@ -4021,6 +5243,7 @@ style="
                         style="
                             display:flex;
                             justify-content:space-between;
+                            gap:15px;
                         "
                     >
 
@@ -4055,12 +5278,11 @@ style="
 
 
         <!-- =================================================
-             PREVIEW BUTTONS
+             PREVIEW CONTROLS
 
-             IMPORTANT:
-             These are OUTSIDE the quotation document.
-             They therefore do NOT go into the PDF.
-             ================================================= -->
+             These buttons are outside finalQuotationDocument
+             and are not included in the generated PDF.
+        ================================================== -->
 
         <div class="preview-controls">
 
@@ -4078,7 +5300,7 @@ style="
                 class="primary-button"
                 onclick="generateQuotation()"
             >
-                Generate Quotation
+                Generate PDF
             </button>
 
         </div>
@@ -4088,7 +5310,7 @@ style="
 
 
 /* =========================================================
-   BACK TO CLIENT DETAILS
+   RETURN TO CLIENT DETAILS
    ========================================================= */
 
 function backToClientDetails() {
@@ -4101,13 +5323,12 @@ function backToClientDetails() {
 
 /* =========================================================
    SECTION 6 OF 7
-   PDF GENERATION
-
-========================================================= */
+   PDF HELPERS + SUMMARY + TERMS + PDF COMPLETION
+   ========================================================= */
 
 
 /* =========================================================
-   IMAGE → DATA URL
+   CONVERT IMAGE TO DATA URL
    ========================================================= */
 
 function imageToDataURL(url) {
@@ -4115,58 +5336,71 @@ function imageToDataURL(url) {
     return new Promise(
         (resolve, reject) => {
 
-            const img =
+            const image =
                 new Image();
 
 
-            img.onload = function () {
+            image.onload =
+                function () {
 
-                try {
+                    try {
 
-                    const canvas =
-                        document.createElement(
-                            "canvas"
+                        const canvas =
+                            document.createElement(
+                                "canvas"
+                            );
+
+
+                        canvas.width =
+                            image.naturalWidth;
+
+
+                        canvas.height =
+                            image.naturalHeight;
+
+
+                        const context =
+                            canvas.getContext(
+                                "2d"
+                            );
+
+
+                        if (!context) {
+
+                            reject(
+                                new Error(
+                                    "Canvas is not supported."
+                                )
+                            );
+
+                            return;
+                        }
+
+
+                        context.drawImage(
+                            image,
+                            0,
+                            0
                         );
 
 
-                    canvas.width =
-                        img.naturalWidth;
-
-
-                    canvas.height =
-                        img.naturalHeight;
-
-
-                    const ctx =
-                        canvas.getContext(
-                            "2d"
+                        resolve(
+                            canvas.toDataURL(
+                                "image/jpeg",
+                                0.95
+                            )
                         );
 
+                    } catch (error) {
 
-                    ctx.drawImage(
-                        img,
-                        0,
-                        0
-                    );
+                        reject(error);
 
+                    }
 
-                    resolve(
-                        canvas.toDataURL(
-                            "image/jpeg",
-                            0.95
-                        )
-                    );
-
-                } catch (error) {
-
-                    reject(error);
-
-                }
-
-            };
+                };
 
 
-            img.onerror =
+            image.onerror =
                 function () {
 
                     reject(
@@ -4179,7 +5413,8 @@ function imageToDataURL(url) {
                 };
 
 
-            img.src = url;
+            image.src =
+                url;
 
         }
     );
@@ -4187,7 +5422,7 @@ function imageToDataURL(url) {
 
 
 /* =========================================================
-   HEADER IMAGE
+   ADD PDF HEADER IMAGE
    ========================================================= */
 
 function addHeaderImage(
@@ -4196,7 +5431,9 @@ function addHeaderImage(
 ) {
 
     if (!headerData) {
+
         return;
+
     }
 
 
@@ -4227,7 +5464,7 @@ function addHeaderImage(
 
 
 /* =========================================================
-   FOOTER IMAGE
+   ADD PDF FOOTER IMAGE
    ========================================================= */
 
 function addFooterToPage(
@@ -4325,7 +5562,7 @@ async function generateQuotation() {
     if (!jsPDFConstructor) {
 
         alert(
-            "PDF library could not be loaded. Please check your internet connection and reload the page."
+            "The PDF library could not be loaded. Please check your internet connection and reload the page."
         );
 
         return;
@@ -4338,11 +5575,11 @@ async function generateQuotation() {
 
 
     /*
-       Header.jpeg and footer.jpeg must be in
-       the same GitHub Pages folder as index.html.
+       header.jpeg and footer.jpeg must be stored in the
+       same GitHub Pages folder as index.html.
 
-       If your files are named header.jpeg and footer.jpeg,
-       keep the names exactly as shown below.
+       The images are converted into data URLs before the
+       PDF is generated.
     */
 
     try {
@@ -4401,15 +5638,6 @@ async function generateQuotation() {
     }
 }
 
-/* =========================================================
-   OVERRIDE / COMPLETE PDF CONTINUATION
-   ========================================================= */
-
-/*
-   Replace the createPDF function from Section 6 with this
-   final version. It uses the same PDF layout but calls the
-   summary function above.
-*/
 
 /* =========================================================
    PDF SUMMARY + TERMS + FOOTERS + SAVE
@@ -4426,50 +5654,66 @@ function createPDFSummaryAndFinish(
     footerHeight,
     startY
 ) {
-    let y = Number(startY) || headerHeight + 8;
+
+    let y =
+        Number(startY) ||
+        headerHeight + 8;
+
 
     const equipmentTotal =
         getEquipmentTotal();
 
+
     const copperTotal =
         getCopperTotal();
+
 
     const drainageTotal =
         getDrainageTotal();
 
+
     const installationTotal =
         getInstallationCommissioningTotal();
+
 
     const additionalItemsTotal =
         getAdditionalItemsTotal();
 
+
     const preliminariesTotal =
         getPreliminariesTotal();
+
 
     const asBuiltDrawingTotal =
         getAsBuiltDrawingTotal();
 
+
     const subtotal =
         getQuotationSubtotal();
 
+
     const vat =
         getQuotationVAT();
+
 
     const grandTotal =
         getQuotationGrandTotal();
 
 
     /* =====================================================
-       HELPER — START A NEW PDF PAGE
+       ADD A NEW PDF PAGE
        ===================================================== */
 
     function addNewPDFPage() {
+
         doc.addPage();
+
 
         addHeaderImage(
             doc,
             headerData
         );
+
 
         y =
             headerHeight + 8;
@@ -4486,7 +5730,9 @@ function createPDFSummaryAndFinish(
         footerHeight -
         90
     ) {
+
         addNewPDFPage();
+
     }
 
 
@@ -4499,7 +5745,9 @@ function createPDFSummaryAndFinish(
         "bold"
     );
 
+
     doc.setFontSize(12);
+
 
     doc.setTextColor(
         7,
@@ -4507,11 +5755,13 @@ function createPDFSummaryAndFinish(
         133
     );
 
+
     doc.text(
         "QUOTATION SUMMARY",
         margin,
         y
     );
+
 
     y += 5;
 
@@ -4524,88 +5774,180 @@ function createPDFSummaryAndFinish(
 
 
     if (equipmentTotal > 0) {
+
         summaryRows.push([
+
             "AC Equipment",
+
             "1 lot",
-            money(equipmentTotal),
-            money(equipmentTotal)
+
+            money(
+                equipmentTotal
+            ),
+
+            money(
+                equipmentTotal
+            )
+
         ]);
+
     }
 
 
     if (copperTotal > 0) {
+
         summaryRows.push([
+
             "Copper Piping",
-            `${number(getTotalCopperLength())} m`,
-            money(quotation.copperRate),
-            money(copperTotal)
+
+            `${
+                number(
+                    getTotalCopperLength()
+                )
+            } m`,
+
+            money(
+                quotation.copperRate
+            ),
+
+            money(
+                copperTotal
+            )
+
         ]);
+
     }
 
 
     if (drainageTotal > 0) {
+
         summaryRows.push([
+
             "Drainage Piping",
-            `${number(getTotalDrainageLength())} m`,
-            money(quotation.drainageRate),
-            money(drainageTotal)
+
+            `${
+                number(
+                    getTotalDrainageLength()
+                )
+            } m`,
+
+            money(
+                quotation.drainageRate
+            ),
+
+            money(
+                drainageTotal
+            )
+
         ]);
+
     }
 
 
     if (installationTotal > 0) {
+
         summaryRows.push([
+
             "Installation and Commissioning",
+
             `${
                 Number(
                     quotation.installationUnitCount
                 ) || 0
             } units`,
+
             money(
                 quotation.installationUnitCost
             ),
-            money(installationTotal)
+
+            money(
+                installationTotal
+            )
+
         ]);
+
     }
 
 
     if (additionalItemsTotal > 0) {
+
         summaryRows.push([
+
             "Accessories / Additional Items",
+
             "1 lot",
-            money(additionalItemsTotal),
-            money(additionalItemsTotal)
+
+            money(
+                additionalItemsTotal
+            ),
+
+            money(
+                additionalItemsTotal
+            )
+
         ]);
+
     }
 
 
     if (preliminariesTotal > 0) {
+
         summaryRows.push([
+
             "Preliminaries",
+
             "1 lot",
-            money(preliminariesTotal),
-            money(preliminariesTotal)
+
+            money(
+                preliminariesTotal
+            ),
+
+            money(
+                preliminariesTotal
+            )
+
         ]);
+
     }
 
 
     if (asBuiltDrawingTotal > 0) {
+
         summaryRows.push([
+
             "As-Built Drawing",
+
             "1 lot",
-            money(asBuiltDrawingTotal),
-            money(asBuiltDrawingTotal)
+
+            money(
+                asBuiltDrawingTotal
+            ),
+
+            money(
+                asBuiltDrawingTotal
+            )
+
         ]);
+
     }
 
 
-    if (summaryRows.length === 0) {
+    if (
+        summaryRows.length === 0
+    ) {
+
         summaryRows.push([
+
             "Quotation Items",
+
             "1 lot",
+
             money(0),
+
             money(0)
+
         ]);
+
     }
 
 
@@ -4618,18 +5960,27 @@ function createPDFSummaryAndFinish(
         startY:
             y,
 
+
         head: [[
+
             "Description",
+
             "Quantity",
+
             "Unit Price",
+
             "Total"
+
         ]],
+
 
         body:
             summaryRows,
 
+
         theme:
             "grid",
+
 
         headStyles: {
 
@@ -4644,7 +5995,9 @@ function createPDFSummaryAndFinish(
 
             fontStyle:
                 "bold"
+
         },
+
 
         styles: {
 
@@ -4656,36 +6009,48 @@ function createPDFSummaryAndFinish(
 
             valign:
                 "middle"
+
         },
+
 
         columnStyles: {
 
             0: {
+
                 cellWidth:
                     70
+
             },
 
             1: {
+
                 cellWidth:
                     28
+
             },
 
             2: {
+
                 cellWidth:
                     42,
 
                 halign:
                     "right"
+
             },
 
             3: {
+
                 cellWidth:
                     42,
 
                 halign:
                     "right"
+
             }
+
         },
+
 
         margin: {
 
@@ -4697,7 +6062,9 @@ function createPDFSummaryAndFinish(
 
             bottom:
                 footerHeight
+
         }
+
     });
 
 
@@ -4716,7 +6083,9 @@ function createPDFSummaryAndFinish(
         footerHeight -
         45
     ) {
+
         addNewPDFPage();
+
     }
 
 
@@ -4729,7 +6098,9 @@ function createPDFSummaryAndFinish(
         "normal"
     );
 
+
     doc.setFontSize(10);
+
 
     doc.setTextColor(
         30,
@@ -4737,11 +6108,13 @@ function createPDFSummaryAndFinish(
         59
     );
 
+
     doc.text(
         "Subtotal before VAT:",
         margin,
         y
     );
+
 
     doc.text(
         money(subtotal),
@@ -4752,6 +6125,7 @@ function createPDFSummaryAndFinish(
                 "right"
         }
     );
+
 
     y += 7;
 
@@ -4766,6 +6140,7 @@ function createPDFSummaryAndFinish(
         y
     );
 
+
     doc.text(
         money(vat),
         pageWidth - margin,
@@ -4775,6 +6150,7 @@ function createPDFSummaryAndFinish(
                 "right"
         }
     );
+
 
     y += 10;
 
@@ -4789,6 +6165,7 @@ function createPDFSummaryAndFinish(
         133
     );
 
+
     doc.roundedRect(
         margin,
         y - 5,
@@ -4799,12 +6176,15 @@ function createPDFSummaryAndFinish(
         "F"
     );
 
+
     doc.setFont(
         "helvetica",
         "bold"
     );
 
+
     doc.setFontSize(11);
+
 
     doc.setTextColor(
         255,
@@ -4812,11 +6192,13 @@ function createPDFSummaryAndFinish(
         255
     );
 
+
     doc.text(
         "TOTAL COST INCLUSIVE OF 16% VAT",
         margin + 4,
         y + 5
     );
+
 
     doc.text(
         money(grandTotal),
@@ -4827,6 +6209,7 @@ function createPDFSummaryAndFinish(
                 "right"
         }
     );
+
 
     y += 24;
 
@@ -4841,7 +6224,9 @@ function createPDFSummaryAndFinish(
         footerHeight -
         75
     ) {
+
         addNewPDFPage();
+
     }
 
 
@@ -4854,7 +6239,9 @@ function createPDFSummaryAndFinish(
         "bold"
     );
 
+
     doc.setFontSize(11);
+
 
     doc.setTextColor(
         7,
@@ -4862,11 +6249,13 @@ function createPDFSummaryAndFinish(
         133
     );
 
+
     doc.text(
         "TERMS AND CONDITIONS OF SALES",
         margin,
         y
     );
+
 
     y += 6;
 
@@ -4878,48 +6267,83 @@ function createPDFSummaryAndFinish(
     const terms = [
 
         [
+
             "Terms of payment:",
+
             "100% advance payment payable to HOTPOINT APPLIANCES LTD or as per approved payment terms."
+
         ],
 
+
         [
+
             "Warranty:",
+
             "Two years warranty on equipment. The warranty shall apply according to the applicable warranty conditions."
+
         ],
 
+
         [
+
             "Delivery timelines:",
+
             "Delivery is expected within 8–12 weeks after order confirmation and receipt of the required advance payment."
+
         ],
 
+
         [
+
             "Quotation validity:",
+
             "This quotation is valid for 14 days from the quotation date."
+
         ],
 
+
         [
+
             "Scope:",
+
             "The scope of work is limited to the items included in the priced bill of quantities."
+
         ],
 
+
         [
+
             "Exclusions:",
+
             "Scaffolding, glass cutting, electrical work, masonry work, wall chasing, drilling and work on false ceilings are excluded unless specifically included."
+
         ],
 
+
         [
+
             "Electrical works:",
+
             "Electrical power supplies for the air conditioners shall be provided by the client. Guidance on the required supplies can be provided."
+
         ],
 
+
         [
+
             "Site support:",
+
             "The client shall provide site access, water, electricity and safe storage for equipment, tools and installation materials."
+
         ],
 
+
         [
+
             "Operating temperature:",
+
             "The recommended operating temperature range for the air-conditioning system is 18–30 degrees Celsius."
+
         ]
 
     ];
@@ -4934,11 +6358,14 @@ function createPDFSummaryAndFinish(
         startY:
             y,
 
+
         body:
             terms,
 
+
         theme:
             "plain",
+
 
         styles: {
 
@@ -4959,7 +6386,9 @@ function createPDFSummaryAndFinish(
 
             overflow:
                 "linebreak"
+
         },
+
 
         columnStyles: {
 
@@ -4976,16 +6405,22 @@ function createPDFSummaryAndFinish(
                     89,
                     133
                 ]
+
             },
+
 
             1: {
 
                 cellWidth:
+
                     pageWidth -
                     margin * 2 -
                     38
+
             }
+
         },
+
 
         margin: {
 
@@ -5000,25 +6435,32 @@ function createPDFSummaryAndFinish(
 
             bottom:
                 footerHeight
+
         },
 
-        didDrawPage: function (data) {
 
-            /*
-               AutoTable may create extra pages if the terms
-               do not fit. Add the header to those new pages.
-            */
+        didDrawPage:
+            function (data) {
 
-            if (
-                data.pageNumber > 1 &&
-                headerData
-            ) {
-                addHeaderImage(
-                    doc,
+                /*
+                   AutoTable may create additional pages when
+                   the terms do not fit on the current page.
+                */
+
+                if (
+                    data.pageNumber > 1 &&
                     headerData
-                );
+                ) {
+
+                    addHeaderImage(
+                        doc,
+                        headerData
+                    );
+
+                }
+
             }
-        }
+
     });
 
 
@@ -5035,21 +6477,27 @@ function createPDFSummaryAndFinish(
         pageNumber <= totalPages;
         pageNumber++
     ) {
-        doc.setPage(pageNumber);
+
+        doc.setPage(
+            pageNumber
+        );
+
 
         addFooterToPage(
             doc,
             footerData,
             pageNumber
         );
+
     }
 
 
     /* =====================================================
-       CREATE SAFE PDF FILENAME
+       CREATE A SAFE PDF FILENAME
        ===================================================== */
 
     const safeClientName =
+
         String(
             quotation.clientName ||
             "Client"
@@ -5069,6 +6517,7 @@ function createPDFSummaryAndFinish(
 
 
     const filename =
+
         `HVAC_Quotation_${
             safeClientName ||
             "Client"
@@ -5079,15 +6528,72 @@ function createPDFSummaryAndFinish(
        DOWNLOAD PDF
        ===================================================== */
 
-    doc.save(filename);
+    doc.save(
+        filename
+    );
 
 
     /* =====================================================
-       SHOW SUCCESS PAGE
+       DISPLAY SUCCESS PAGE
        ===================================================== */
 
     showPage(15);
 }
+
+/* =========================================================
+   SECTION 7 OF 7
+   PDF DOCUMENT + RESET + INITIALIZATION
+   ========================================================= */
+
+
+/* =========================================================
+   TOTAL COPPER LENGTH
+
+   Included here to ensure the function is available to the
+   quotation preview and PDF calculations.
+   ========================================================= */
+
+function getTotalCopperLength() {
+
+    return quotation.rooms.reduce(
+
+        (sum, room) =>
+
+            sum +
+            Number(
+                room.copper || 0
+            ),
+
+        0
+
+    );
+}
+
+
+/* =========================================================
+   TOTAL DRAINAGE LENGTH
+   ========================================================= */
+
+function getTotalDrainageLength() {
+
+    return quotation.rooms.reduce(
+
+        (sum, room) =>
+
+            sum +
+            Number(
+                room.drainage || 0
+            ),
+
+        0
+
+    );
+}
+
+
+/* =========================================================
+   CREATE THE PDF DOCUMENT
+   ========================================================= */
 
 function createPDF(
     headerData,
@@ -5117,11 +6623,16 @@ function createPDF(
         doc.internal.pageSize.getHeight();
 
 
-    const margin = 12;
+    const margin =
+        12;
 
-    const headerHeight = 45;
 
-    const footerHeight = 38;
+    const headerHeight =
+        45;
+
+
+    const footerHeight =
+        38;
 
 
     addHeaderImage(
@@ -5135,8 +6646,8 @@ function createPDF(
 
 
     /* =====================================================
-       TITLE
-    ===================================================== */
+       PDF TITLE
+       ===================================================== */
 
     doc.setFont(
         "helvetica",
@@ -5170,7 +6681,7 @@ function createPDF(
 
     /* =====================================================
        CLIENT DETAILS
-    ===================================================== */
+       ===================================================== */
 
     doc.setFontSize(9);
 
@@ -5235,7 +6746,9 @@ function createPDF(
 
 
             doc.text(
-                row[1] || "",
+                String(
+                    row[1] || ""
+                ),
                 margin + 32,
                 y
             );
@@ -5252,7 +6765,7 @@ function createPDF(
 
     /* =====================================================
        EQUIPMENT
-    ===================================================== */
+       ===================================================== */
 
     doc.setFont(
         "helvetica",
@@ -5273,42 +6786,74 @@ function createPDF(
     y += 3;
 
 
+    const equipmentRows =
+
+        quotation.acPrices.map(
+            item => [
+
+                `${
+                    item.brand ||
+                    "LG"
+                } — ${
+                    Number(
+                        item.capacity
+                    ).toLocaleString(
+                        "en-KE"
+                    )
+                } BTU/hr — ${
+                    item.type ||
+                    "HIGHWALL"
+                }\nRoom(s): ${
+                    Array.isArray(
+                        item.rooms
+                    )
+
+                        ? item.rooms.join(", ")
+                        : ""
+                }`,
+
+                Number(
+                    item.quantity
+                ) || 0,
+
+                money(
+                    item.unitPrice
+                ),
+
+                money(
+                    item.total
+                )
+
+            ]
+        );
+
+
     doc.autoTable({
 
         startY:
             y,
 
+
         head: [[
-            "AC Capacity",
+
+            "Brand / Capacity / Type / Room(s)",
+
             "Qty",
+
             "Unit Price",
+
             "Total"
+
         ]],
 
+
         body:
+            equipmentRows,
 
-            quotation.acPrices.map(
-                item => [
-
-                    `${Number(
-                        item.capacity
-                    ).toLocaleString()} BTU/hr`,
-
-                    item.quantity,
-
-                    money(
-                        item.unitPrice
-                    ),
-
-                    money(
-                        item.total
-                    )
-
-                ]
-            ),
 
         theme:
             "grid",
+
 
         headStyles: {
 
@@ -5319,9 +6864,13 @@ function createPDF(
             ],
 
             textColor:
-                255
+                255,
+
+            fontStyle:
+                "bold"
 
         },
+
 
         styles: {
 
@@ -5329,28 +6878,58 @@ function createPDF(
                 8,
 
             cellPadding:
-                2.5
+                2.5,
+
+            valign:
+                "middle",
+
+            overflow:
+                "linebreak"
 
         },
+
 
         columnStyles: {
 
+            0: {
+
+                cellWidth:
+                    82
+
+            },
+
             1: {
+
+                cellWidth:
+                    18,
+
                 halign:
                     "right"
+
             },
 
             2: {
+
+                cellWidth:
+                    40,
+
                 halign:
                     "right"
+
             },
 
             3: {
+
+                cellWidth:
+                    42,
+
                 halign:
                     "right"
+
             }
 
         },
+
 
         margin: {
 
@@ -5360,10 +6939,31 @@ function createPDF(
             right:
                 margin,
 
+            top:
+                headerHeight + 5,
+
             bottom:
                 footerHeight
 
-        }
+        },
+
+
+        didDrawPage:
+            function (data) {
+
+                if (
+                    data.pageNumber > 1 &&
+                    headerData
+                ) {
+
+                    addHeaderImage(
+                        doc,
+                        headerData
+                    );
+
+                }
+
+            }
 
     });
 
@@ -5374,8 +6974,50 @@ function createPDF(
 
 
     /* =====================================================
-       COPPER
-    ===================================================== */
+       CHECK SPACE FOR COPPER TABLE
+       ===================================================== */
+
+    if (
+        y >
+        pageHeight -
+        footerHeight -
+        50
+    ) {
+
+        doc.addPage();
+
+
+        addHeaderImage(
+            doc,
+            headerData
+        );
+
+
+        y =
+            headerHeight + 8;
+
+    }
+
+
+    /* =====================================================
+       COPPER AND ACCESSORIES
+       ===================================================== */
+
+    doc.setFont(
+        "helvetica",
+        "bold"
+    );
+
+
+    doc.setFontSize(11);
+
+
+    doc.setTextColor(
+        30,
+        41,
+        59
+    );
+
 
     doc.text(
         "2. COPPER AND ACCESSORIES",
@@ -5392,20 +7034,29 @@ function createPDF(
         startY:
             y,
 
+
         head: [[
+
             "Item",
+
             "Quantity",
+
             "Unit Price",
+
             "Total"
+
         ]],
+
 
         body: [[
 
             "Copper",
 
-            `${number(
-                getTotalCopperLength()
-            )} m`,
+            `${
+                number(
+                    getTotalCopperLength()
+                )
+            } m`,
 
             money(
                 quotation.copperRate
@@ -5417,8 +7068,10 @@ function createPDF(
 
         ]],
 
+
         theme:
             "grid",
+
 
         headStyles: {
 
@@ -5429,9 +7082,13 @@ function createPDF(
             ],
 
             textColor:
-                255
+                255,
+
+            fontStyle:
+                "bold"
 
         },
+
 
         styles: {
 
@@ -5443,6 +7100,33 @@ function createPDF(
 
         },
 
+
+        columnStyles: {
+
+            1: {
+
+                halign:
+                    "right"
+
+            },
+
+            2: {
+
+                halign:
+                    "right"
+
+            },
+
+            3: {
+
+                halign:
+                    "right"
+
+            }
+
+        },
+
+
         margin: {
 
             left:
@@ -5450,6 +7134,9 @@ function createPDF(
 
             right:
                 margin,
+
+            top:
+                headerHeight + 5,
 
             bottom:
                 footerHeight
@@ -5465,8 +7152,43 @@ function createPDF(
 
 
     /* =====================================================
-       DRAINAGE
-    ===================================================== */
+       CHECK SPACE FOR DRAINAGE TABLE
+       ===================================================== */
+
+    if (
+        y >
+        pageHeight -
+        footerHeight -
+        50
+    ) {
+
+        doc.addPage();
+
+
+        addHeaderImage(
+            doc,
+            headerData
+        );
+
+
+        y =
+            headerHeight + 8;
+
+    }
+
+
+    /* =====================================================
+       DRAINAGE AND ACCESSORIES
+       ===================================================== */
+
+    doc.setFont(
+        "helvetica",
+        "bold"
+    );
+
+
+    doc.setFontSize(11);
+
 
     doc.text(
         "3. DRAINAGE AND ACCESSORIES",
@@ -5483,20 +7205,29 @@ function createPDF(
         startY:
             y,
 
+
         head: [[
+
             "Item",
+
             "Quantity",
+
             "Unit Price",
+
             "Total"
+
         ]],
+
 
         body: [[
 
             "Drainage",
 
-            `${number(
-                getTotalDrainageLength()
-            )} m`,
+            `${
+                number(
+                    getTotalDrainageLength()
+                )
+            } m`,
 
             money(
                 quotation.drainageRate
@@ -5508,8 +7239,10 @@ function createPDF(
 
         ]],
 
+
         theme:
             "grid",
+
 
         headStyles: {
 
@@ -5520,9 +7253,13 @@ function createPDF(
             ],
 
             textColor:
-                255
+                255,
+
+            fontStyle:
+                "bold"
 
         },
+
 
         styles: {
 
@@ -5534,6 +7271,33 @@ function createPDF(
 
         },
 
+
+        columnStyles: {
+
+            1: {
+
+                halign:
+                    "right"
+
+            },
+
+            2: {
+
+                halign:
+                    "right"
+
+            },
+
+            3: {
+
+                halign:
+                    "right"
+
+            }
+
+        },
+
+
         margin: {
 
             left:
@@ -5541,6 +7305,9 @@ function createPDF(
 
             right:
                 margin,
+
+            top:
+                headerHeight + 5,
 
             bottom:
                 footerHeight
@@ -5556,9 +7323,8 @@ function createPDF(
 
 
     /* =====================================================
-       ADDITIONAL WORKS
-       Installation Commissioning is always first.
-    ===================================================== */
+       CHECK SPACE FOR INSTALLATION AND ACCESSORIES
+       ===================================================== */
 
     if (
         y >
@@ -5569,25 +7335,34 @@ function createPDF(
 
         doc.addPage();
 
+
         addHeaderImage(
             doc,
             headerData
         );
 
+
         y =
             headerHeight + 8;
+
     }
 
+
+    /* =====================================================
+       INSTALLATION COMMISSIONING & ACCESSORIES
+       ===================================================== */
 
     doc.setFont(
         "helvetica",
         "bold"
     );
 
+
     doc.setFontSize(11);
 
+
     doc.text(
-        "4. ADDITIONAL WORKS",
+        "4. INSTALLATION COMMISSIONING & ACCESSORIES",
         margin,
         y
     );
@@ -5599,11 +7374,20 @@ function createPDF(
     const additionalWorksRows = [
 
         [
-            "Installation Commissioning",
 
-            `${number(
-                quotation.installationUnitCount
-            )} units`,
+            `Installation Commissioning\n${
+                quotation.installationRegion ||
+                ""
+            } — ${
+                quotation.acType ||
+                ""
+            }`,
+
+            `${
+                number(
+                    quotation.installationUnitCount
+                )
+            } units`,
 
             money(
                 quotation.installationUnitCost
@@ -5612,16 +7396,22 @@ function createPDF(
             money(
                 getInstallationCommissioningTotal()
             )
+
         ],
+
 
         ...quotation.additionalItems.map(
             item => [
 
                 item.name,
 
-                `${number(
-                    item.quantity
-                )} ${item.unit}`,
+                `${
+                    number(
+                        item.quantity
+                    )
+                } ${
+                    item.unit
+                }`,
 
                 money(
                     item.unitPrice
@@ -5630,8 +7420,10 @@ function createPDF(
                 money(
                     item.total
                 )
+
             ]
         )
+
     ];
 
 
@@ -5640,18 +7432,27 @@ function createPDF(
         startY:
             y,
 
+
         head: [[
+
             "Item",
+
             "Quantity",
+
             "Unit Price",
+
             "Total"
+
         ]],
+
 
         body:
             additionalWorksRows,
 
+
         theme:
             "grid",
+
 
         headStyles: {
 
@@ -5662,8 +7463,13 @@ function createPDF(
             ],
 
             textColor:
-                255
+                255,
+
+            fontStyle:
+                "bold"
+
         },
+
 
         styles: {
 
@@ -5671,8 +7477,55 @@ function createPDF(
                 8,
 
             cellPadding:
-                2.5
+                2.5,
+
+            overflow:
+                "linebreak"
+
         },
+
+
+        columnStyles: {
+
+            0: {
+
+                cellWidth:
+                    72
+
+            },
+
+            1: {
+
+                cellWidth:
+                    28,
+
+                halign:
+                    "right"
+
+            },
+
+            2: {
+
+                cellWidth:
+                    40,
+
+                halign:
+                    "right"
+
+            },
+
+            3: {
+
+                cellWidth:
+                    42,
+
+                halign:
+                    "right"
+
+            }
+
+        },
+
 
         margin: {
 
@@ -5682,9 +7535,32 @@ function createPDF(
             right:
                 margin,
 
+            top:
+                headerHeight + 5,
+
             bottom:
                 footerHeight
-        }
+
+        },
+
+
+        didDrawPage:
+            function (data) {
+
+                if (
+                    data.pageNumber > 1 &&
+                    headerData
+                ) {
+
+                    addHeaderImage(
+                        doc,
+                        headerData
+                    );
+
+                }
+
+            }
+
     });
 
 
@@ -5694,8 +7570,8 @@ function createPDF(
 
 
     /* =====================================================
-       SUMMARY + TERMS + FOOTER + SAVE
-    ===================================================== */
+       SUMMARY + TERMS + FOOTERS + SAVE
+       ===================================================== */
 
     createPDFSummaryAndFinish(
 
@@ -5722,7 +7598,7 @@ function createPDF(
 
 
 /* =========================================================
-   START NEW QUOTATION
+   START A NEW QUOTATION
    ========================================================= */
 
 function startNewQuotation() {
@@ -5731,37 +7607,57 @@ function startNewQuotation() {
 
         rooms: [],
 
-        copperRate: 3200,
+        copperRate:
+            3200,
 
-        drainageRate: 0,
+        drainageRate:
+            0,
 
-        installationRegion: "",
-        acType: "",
-        installationUnitCost: 0,
-        installationUnitCount: 0,
-        installationTotal: 0,
+        installationRegion:
+            "",
+
+        acType:
+            "",
+
+        installationUnitCost:
+            0,
+
+        installationUnitCount:
+            0,
+
+        installationTotal:
+            0,
 
         additionalItems: [],
 
-        includePreliminaries: false,
+        includePreliminaries:
+            false,
 
-        preliminariesCost: 15000,
+        preliminariesCost:
+            15000,
 
-        includeAsBuiltDrawing: false,
+        includeAsBuiltDrawing:
+            false,
 
-        asBuiltDrawingCost: 5000,
+        asBuiltDrawingCost:
+            5000,
 
         acPrices: [],
 
-        clientName: "",
+        clientName:
+            "",
 
-        installationLocation: "",
+        installationLocation:
+            "",
 
-        salesPerson: "",
+        salesPerson:
+            "",
 
-        salesPhone: "",
+        salesPhone:
+            "",
 
-        salesEmail: ""
+        salesEmail:
+            ""
 
     };
 
@@ -5819,11 +7715,26 @@ function startNewQuotation() {
 
         if (element) {
 
-            element.value = "";
+            element.value =
+                "";
 
         }
 
     });
+
+
+    const quotationPreview =
+        document.getElementById(
+            "quotationPreview"
+        );
+
+
+    if (quotationPreview) {
+
+        quotationPreview.innerHTML =
+            "";
+
+    }
 
 
     showPage(1);
@@ -5837,6 +7748,23 @@ function startNewQuotation() {
 document.addEventListener(
     "DOMContentLoaded",
     function () {
+
+        /*
+           Refresh the jsPDF constructor in case the PDF
+           library finished loading after script.js.
+        */
+
+        if (
+            window.jspdf &&
+            typeof window.jspdf.jsPDF ===
+            "function"
+        ) {
+
+            jsPDFConstructor =
+                window.jspdf.jsPDF;
+
+        }
+
 
         const year =
             document.getElementById(
@@ -5857,4 +7785,3 @@ document.addEventListener(
 
     }
 );
-
