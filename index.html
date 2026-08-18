@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -10,644 +11,908 @@
     >
 
     <meta
-        name="description"
-        content="Mobile-friendly HVAC site quotation system"
+        name="theme-color"
+        content="#075985"
     >
 
-    <title>Onsite Quotation</title>
+    <title>
+        Onsite Quotation
+    </title>
 
     <link
         rel="stylesheet"
         href="style.css"
     >
 
-    <!-- PDF libraries -->
+
+    <!-- PDF LIBRARIES -->
+
     <script
         src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
-        defer
     ></script>
 
     <script
         src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"
-        defer
     ></script>
 
-    <!-- Main JavaScript -->
-    <script
-        src="script.js"
-        defer
-    ></script>
 </head>
+
 
 <body>
 
+
+<header class="top-header">
+
+    <div>
+
+        <h1>
+            Onsite Quotation
+        </h1>
+
+        <p>
+            HVAC Site Quotation System
+        </p>
+
+    </div>
+
+</header>
+
+
+
+<main class="app-container">
+
+
     <!-- =====================================================
-         HEADER
+         PAGE 1 — ROOMS
     ====================================================== -->
 
-    <header class="top-header">
-        <div>
-            <h1>Onsite Quotation</h1>
-            <p>HVAC Site Quotation System</p>
+    <section
+        class="page active"
+        id="page1"
+    >
+
+        <div class="page-heading">
+
+            <span class="step-label">
+                Step 1
+            </span>
+
+            <h2>
+                Rooms Requiring Air Conditioning
+            </h2>
+
+            <p>
+                Add every room that will be included in the quotation.
+            </p>
+
         </div>
-    </header>
 
 
-    <main class="app-container">
+        <div class="card">
 
-        <!-- =================================================
-             PAGE 1 — ADD ROOMS
-        ================================================== -->
+            <div id="roomInputContainer">
 
-        <section
-            class="page active"
-            id="page1"
-        >
-            <div class="card">
+                <div class="input-row room-input-row">
 
-                <h2>1. Add Rooms</h2>
-
-                <p>
-                    Enter every room that requires air conditioning.
-                </p>
-
-                <div id="roomInputContainer">
-
-                    <div class="input-row room-input-row">
-
-                        <input
-                            type="text"
-                            class="room-name-input"
-                            placeholder="e.g. Living Room"
-                        >
-
-                        <button
-                            type="button"
-                            class="remove-input"
-                            onclick="removeRoomInput(this)"
-                            aria-label="Remove room"
-                        >
-                            ×
-                        </button>
-
-                    </div>
-
-                </div>
-
-                <button
-                    type="button"
-                    class="secondary-button full-width"
-                    onclick="addRoomInput()"
-                >
-                    + Add Another Room
-                </button>
-
-                <button
-                    type="button"
-                    class="primary-button full-width"
-                    onclick="saveRooms()"
-                >
-                    Preview Rooms →
-                </button>
-
-            </div>
-        </section>
-
-
-        <!-- =================================================
-             PAGE 2 — ROOM PREVIEW
-        ================================================== -->
-
-        <section
-            class="page"
-            id="page2"
-        >
-            <div class="card">
-
-                <h2>2. Rooms Preview</h2>
-
-                <div id="roomPreview"></div>
-
-                <div class="button-row">
+                    <input
+                        type="text"
+                        class="room-name-input"
+                        placeholder="e.g. Living Room"
+                    >
 
                     <button
                         type="button"
-                        class="secondary-button"
-                        onclick="showPage(1)"
+                        class="remove-input"
+                        onclick="removeRoomInput(this)"
+                        aria-label="Remove room"
                     >
-                        ← Back
-                    </button>
-
-                    <button
-                        type="button"
-                        class="primary-button"
-                        onclick="goToDimensions()"
-                    >
-                        Proceed →
+                        ×
                     </button>
 
                 </div>
 
             </div>
-        </section>
 
 
-        <!-- =================================================
-             PAGE 3 — ROOM DIMENSIONS
-        ================================================== -->
+            <button
+                type="button"
+                class="secondary-button full-width"
+                onclick="addRoomInput()"
+            >
+                + Add Another Room
+            </button>
 
-        <section
-            class="page"
-            id="page3"
-        >
-            <div class="card">
 
-                <h2>3. Room Dimensions</h2>
+            <button
+                type="button"
+                class="primary-button full-width"
+                onclick="saveRooms()"
+            >
+                Preview Rooms →
+            </button>
 
-                <p>
-                    Enter each room's length and width in metres.
-                </p>
+        </div>
 
-                <div id="dimensionInputs"></div>
+    </section>
 
-                <div class="button-row">
-
-                    <button
-                        type="button"
-                        class="secondary-button"
-                        onclick="showPage(2)"
-                    >
-                        ← Back
-                    </button>
-
-                    <button
-                        type="button"
-                        class="primary-button"
-                        onclick="previewDimensions()"
-                    >
-                        Preview Dimensions →
-                    </button>
-
-                </div>
-
-            </div>
-        </section>
-
-
-        <!-- =================================================
-             PAGE 4 — DIMENSIONS PREVIEW
-        ================================================== -->
-
-        <section
-            class="page"
-            id="page4"
-        >
-            <div class="card">
-
-                <h2>4. Dimensions Preview</h2>
-
-                <div id="dimensionPreview"></div>
-
-                <div class="button-row">
-
-                    <button
-                        type="button"
-                        class="secondary-button"
-                        onclick="showPage(3)"
-                    >
-                        ← Back
-                    </button>
-
-                    <button
-                        type="button"
-                        class="primary-button"
-                        onclick="goToCopper()"
-                    >
-                        Proceed →
-                    </button>
-
-                </div>
-
-            </div>
-        </section>
-
-
-        <!-- =================================================
-             PAGE 5 — COPPER AND DRAINAGE LENGTHS
-        ================================================== -->
-
-        <section
-            class="page"
-            id="page5"
-        >
-            <div class="card">
-
-                <h2>5. Copper and Drainage Lengths</h2>
-
-                <div id="copperInputs"></div>
-
-                <div class="button-row">
-
-                    <button
-                        type="button"
-                        class="secondary-button"
-                        onclick="showPage(4)"
-                    >
-                        ← Back
-                    </button>
-
-                    <button
-                        type="button"
-                        class="primary-button"
-                        onclick="previewCopper()"
-                    >
-                        Preview Lengths →
-                    </button>
-
-                </div>
-
-            </div>
-        </section>
-
-
-        <!-- =================================================
-             PAGE 6 — COPPER AND DRAINAGE PREVIEW
-        ================================================== -->
-
-        <section
-            class="page"
-            id="page6"
-        >
-            <div class="card">
-
-                <h2>6. Copper and Drainage Preview</h2>
-
-                <div id="copperPreview"></div>
-
-                <div class="button-row">
-
-                    <button
-                        type="button"
-                        class="secondary-button"
-                        onclick="showPage(5)"
-                    >
-                        ← Back
-                    </button>
-
-                    <button
-                        type="button"
-                        class="primary-button"
-                        onclick="goToCoolingLoad()"
-                    >
-                        Proceed →
-                    </button>
-
-                </div>
-
-            </div>
-        </section>
-
-
-        <!-- =================================================
-             PAGE 7 — COOLING LOAD
-        ================================================== -->
-
-        <section
-            class="page"
-            id="page7"
-        >
-            <div class="card">
-
-                <h2>7. Cooling Load</h2>
-
-                <p>
-                    Enter the cooling-load factor for each room.
-                </p>
-
-                <div id="coolingLoadInputs"></div>
-
-                <div class="button-row">
-
-                    <button
-                        type="button"
-                        class="secondary-button"
-                        onclick="showPage(6)"
-                    >
-                        ← Back
-                    </button>
-
-                    <button
-                        type="button"
-                        class="primary-button"
-                        onclick="previewCoolingLoad()"
-                    >
-                        Preview Recommendations →
-                    </button>
-
-                </div>
-
-            </div>
-        </section>
-
-
-        <!-- =================================================
-             PAGE 8 — AC RECOMMENDATIONS
-        ================================================== -->
-
-        <section
-            class="page"
-            id="page8"
-        >
-            <div class="card">
-
-                <h2>8. AC Recommendations</h2>
-
-                <div id="coolingLoadPreview"></div>
-
-                <div class="button-row">
-
-                    <button
-                        type="button"
-                        class="secondary-button"
-                        onclick="showPage(7)"
-                    >
-                        ← Back
-                    </button>
-
-                    <button
-                        type="button"
-                        class="primary-button"
-                        onclick="goToACPrices()"
-                    >
-                        Proceed →
-                    </button>
-
-                </div>
-
-            </div>
-        </section>
-
-
-        <!-- =================================================
-             PAGE 9 — AC PRICES
-        ================================================== -->
-
-        <section
-            class="page"
-            id="page9"
-        >
-            <div class="card">
-
-                <h2>9. AC Equipment Prices</h2>
-
-                <div id="acPriceInputs"></div>
-
-                <div class="button-row">
-
-                    <button
-                        type="button"
-                        class="secondary-button"
-                        onclick="showPage(8)"
-                    >
-                        ← Back
-                    </button>
-
-                    <button
-                        type="button"
-                        class="primary-button"
-                        onclick="saveACPrices()"
-                    >
-                        Continue to Material Rates →
-                    </button>
-
-                </div>
-
-            </div>
-        </section>
-
-
-        <!-- =================================================
-             PAGE 10 — MATERIAL RATES
-        ================================================== -->
-
-        <section
-            class="page"
-            id="page10"
-        >
-            <div class="card">
-
-                <h2>10. Material Rates</h2>
-
-                <label for="copperRate">
-                    Copper pipe rate per metre (KES)
-                </label>
-
-                <input
-                    id="copperRate"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value="3200"
-                >
-
-                <label for="drainageRate">
-                    Drainage pipe rate per metre (KES)
-                </label>
-
-                <input
-                    id="drainageRate"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value="0"
-                >
-
-                <div class="button-row">
-
-                    <button
-                        type="button"
-                        class="secondary-button"
-                        onclick="showPage(9)"
-                    >
-                        ← Back
-                    </button>
-
-                    <button
-                        type="button"
-                        class="primary-button"
-                        onclick="saveMaterialRates()"
-                    >
-                        Continue to Installation Cost →
-                    </button>
-
-                </div>
-
-            </div>
-        </section>
-
-
-        <!-- =================================================
-             PAGE 11 — INSTALLATION COST
-        ================================================== -->
-
-        <section
-            class="page"
-            id="page11"
-        >
-            <div class="card">
-
-                <h2>
-                    11. Installation Commissioning Cost
-                </h2>
-
-                <p>
-                    The installation form is prepared automatically
-                    from the selected AC quantities.
-                </p>
-
-            </div>
-        </section>
-
-
-        <!-- =================================================
-             PAGE 12 — ADDITIONAL ITEMS
-        ================================================== -->
-
-        <section
-            class="page"
-            id="page12"
-        >
-            <div id="additionalItems"></div>
-
-            <div id="additionalItemsPreview"></div>
-        </section>
-
-
-        <!-- =================================================
-             PAGE 13 — CLIENT DETAILS
-        ================================================== -->
-
-        <section
-            class="page"
-            id="page13"
-        >
-            <div class="card">
-
-                <h2>13. Client and Sales Details</h2>
-
-                <label for="clientName">
-                    Client Name
-                </label>
-
-                <input
-                    id="clientName"
-                    type="text"
-                    autocomplete="name"
-                    required
-                >
-
-                <label for="installationLocation">
-                    Installation Location
-                </label>
-
-                <input
-                    id="installationLocation"
-                    type="text"
-                    required
-                >
-
-                <label for="salesPerson">
-                    Salesperson
-                </label>
-
-                <input
-                    id="salesPerson"
-                    type="text"
-                >
-
-                <label for="salesPhone">
-                    Sales Phone
-                </label>
-
-                <input
-                    id="salesPhone"
-                    type="tel"
-                    autocomplete="tel"
-                >
-
-                <label for="salesEmail">
-                    Sales Email
-                </label>
-
-                <input
-                    id="salesEmail"
-                    type="email"
-                    autocomplete="email"
-                >
-
-                <div class="button-row">
-
-                    <button
-                        type="button"
-                        class="secondary-button"
-                        onclick="showPage(12)"
-                    >
-                        ← Back
-                    </button>
-
-                    <button
-                        type="button"
-                        class="primary-button"
-                        onclick="proceedToQuotationPreview()"
-                    >
-                        Preview Quotation →
-                    </button>
-
-                </div>
-
-            </div>
-        </section>
-
-
-        <!-- =================================================
-             PAGE 14 — FINAL QUOTATION PREVIEW
-        ================================================== -->
-
-        <section
-            class="page"
-            id="page14"
-        >
-            <div class="card quotation-card">
-
-                <h2>14. Quotation Preview</h2>
-
-                <div id="quotationPreview"></div>
-
-            </div>
-        </section>
-
-    </main>
 
 
     <!-- =====================================================
-         FOOTER
+         PAGE 2 — ROOM PREVIEW
     ====================================================== -->
 
-    <footer class="site-footer">
+    <section
+        class="page"
+        id="page2"
+    >
 
-        <p>
-            &copy;
-            <span id="currentYear"></span>
-            Moses Ntella Taa
-        </p>
+        <div class="page-heading">
 
-        <p>
-            <a href="mailto:hvacmsaintern@hotpoint.co.ke">
-                hvacmsaintern@hotpoint.co.ke
-            </a>
-        </p>
+            <span class="step-label">
+                Step 2
+            </span>
 
-    </footer>
+            <h2>
+                Room Preview
+            </h2>
+
+            <p>
+                Rename or delete rooms before continuing.
+            </p>
+
+        </div>
+
+
+        <div id="roomPreview"></div>
+
+
+        <div class="navigation-buttons">
+
+            <button
+                type="button"
+                class="secondary-button"
+                onclick="showPage(1)"
+            >
+                ← Back
+            </button>
+
+
+            <button
+                type="button"
+                class="primary-button"
+                onclick="goToDimensions()"
+            >
+                Proceed to Dimensions →
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         PAGE 3 — ROOM DIMENSIONS
+    ====================================================== -->
+
+    <section
+        class="page"
+        id="page3"
+    >
+
+        <div class="page-heading">
+
+            <span class="step-label">
+                Step 3
+            </span>
+
+            <h2>
+                Room Dimensions
+            </h2>
+
+            <p>
+                Enter the length and width of each room in metres.
+            </p>
+
+        </div>
+
+
+        <div id="dimensionInputs"></div>
+
+
+        <div class="navigation-buttons">
+
+            <button
+                type="button"
+                class="secondary-button"
+                onclick="showPage(2)"
+            >
+                ← Back
+            </button>
+
+
+            <button
+                type="button"
+                class="primary-button"
+                onclick="previewDimensions()"
+            >
+                Preview Dimensions →
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         PAGE 4 — DIMENSIONS PREVIEW
+    ====================================================== -->
+
+    <section
+        class="page"
+        id="page4"
+    >
+
+        <div class="page-heading">
+
+            <span class="step-label">
+                Step 4
+            </span>
+
+            <h2>
+                Dimensions Preview
+            </h2>
+
+            <p>
+                Confirm the room dimensions and calculated areas.
+            </p>
+
+        </div>
+
+
+        <div
+            class="card"
+            id="dimensionPreview"
+        ></div>
+
+
+        <div class="navigation-buttons">
+
+            <button
+                type="button"
+                class="secondary-button"
+                onclick="showPage(3)"
+            >
+                ← Back
+            </button>
+
+
+            <button
+                type="button"
+                class="primary-button"
+                onclick="goToCopper()"
+            >
+                Proceed to Copper &amp; Drainage →
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         PAGE 5 — COPPER AND DRAINAGE
+    ====================================================== -->
+
+    <section
+        class="page"
+        id="page5"
+    >
+
+        <div class="page-heading">
+
+            <span class="step-label">
+                Step 5
+            </span>
+
+            <h2>
+                Copper &amp; Drainage Lengths
+            </h2>
+
+            <p>
+                Enter the required lengths for every room.
+            </p>
+
+        </div>
+
+
+        <div id="copperInputs"></div>
+
+
+        <div class="navigation-buttons">
+
+            <button
+                type="button"
+                class="secondary-button"
+                onclick="showPage(4)"
+            >
+                ← Back
+            </button>
+
+
+            <button
+                type="button"
+                class="primary-button"
+                onclick="previewCopper()"
+            >
+                Preview Lengths →
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         PAGE 6 — COPPER AND DRAINAGE PREVIEW
+    ====================================================== -->
+
+    <section
+        class="page"
+        id="page6"
+    >
+
+        <div class="page-heading">
+
+            <span class="step-label">
+                Step 6
+            </span>
+
+            <h2>
+                Copper &amp; Drainage Preview
+            </h2>
+
+            <p>
+                Confirm the lengths before calculating cooling loads.
+            </p>
+
+        </div>
+
+
+        <div
+            class="card"
+            id="copperPreview"
+        ></div>
+
+
+        <div class="navigation-buttons">
+
+            <button
+                type="button"
+                class="secondary-button"
+                onclick="showPage(5)"
+            >
+                ← Back
+            </button>
+
+
+            <button
+                type="button"
+                class="primary-button"
+                onclick="goToCoolingLoad()"
+            >
+                Proceed to Cooling Load →
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         PAGE 7 — COOLING LOAD
+    ====================================================== -->
+
+    <section
+        class="page"
+        id="page7"
+    >
+
+        <div class="page-heading">
+
+            <span class="step-label">
+                Step 7
+            </span>
+
+            <h2>
+                Cooling Load Factors
+            </h2>
+
+            <p>
+                Enter the BTU/hr per square metre factor for every room.
+            </p>
+
+        </div>
+
+
+        <div id="coolingLoadInputs"></div>
+
+
+        <div class="navigation-buttons">
+
+            <button
+                type="button"
+                class="secondary-button"
+                onclick="showPage(6)"
+            >
+                ← Back
+            </button>
+
+
+            <button
+                type="button"
+                class="primary-button"
+                onclick="previewCoolingLoad()"
+            >
+                Preview AC Recommendations →
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         PAGE 8 — AC RECOMMENDATIONS
+    ====================================================== -->
+
+    <section
+        class="page"
+        id="page8"
+    >
+
+        <div class="page-heading">
+
+            <span class="step-label">
+                Step 8
+            </span>
+
+            <h2>
+                AC Recommendation Preview
+            </h2>
+
+            <p>
+                Adjust the capacity, type and brand for every
+                recommended AC unit.
+            </p>
+
+        </div>
+
+
+        <div id="coolingLoadPreview"></div>
+
+
+        <div class="navigation-buttons">
+
+            <button
+                type="button"
+                class="secondary-button"
+                onclick="showPage(7)"
+            >
+                ← Back
+            </button>
+
+
+            <button
+                type="button"
+                class="primary-button"
+                onclick="goToACPrices()"
+            >
+                Proceed to AC Prices →
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         PAGE 9 — AC PRICES
+    ====================================================== -->
+
+    <section
+        class="page"
+        id="page9"
+    >
+
+        <div class="page-heading">
+
+            <span class="step-label">
+                Step 9
+            </span>
+
+            <h2>
+                AC Equipment Prices
+            </h2>
+
+            <p>
+                Enter the unit price for each selected brand,
+                capacity and AC type combination.
+            </p>
+
+        </div>
+
+
+        <div id="acPriceInputs"></div>
+
+
+        <div class="navigation-buttons">
+
+            <button
+                type="button"
+                class="secondary-button"
+                onclick="showPage(8)"
+            >
+                ← Back
+            </button>
+
+
+            <button
+                type="button"
+                class="primary-button"
+                onclick="saveACPrices()"
+            >
+                Proceed to Material Rates →
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         PAGE 10 — MATERIAL RATES
+    ====================================================== -->
+
+    <section
+        class="page"
+        id="page10"
+    >
+
+        <div class="page-heading">
+
+            <span class="step-label">
+                Step 10
+            </span>
+
+            <h2>
+                Material Rates
+            </h2>
+
+            <p>
+                Enter the copper and drainage rates per metre.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <label for="copperRate">
+                Copper Rate (KES/m)
+            </label>
+
+            <input
+                type="number"
+                id="copperRate"
+                min="0"
+                step="0.01"
+                value="3200"
+                placeholder="e.g. 3200"
+            >
+
+
+            <label for="drainageRate">
+                Drainage Rate (KES/m)
+            </label>
+
+            <input
+                type="number"
+                id="drainageRate"
+                min="0"
+                step="0.01"
+                value="0"
+                placeholder="e.g. 500"
+            >
+
+        </div>
+
+
+        <div class="navigation-buttons">
+
+            <button
+                type="button"
+                class="secondary-button"
+                onclick="showPage(9)"
+            >
+                ← Back
+            </button>
+
+
+            <button
+                type="button"
+                class="primary-button"
+                onclick="saveMaterialRates()"
+            >
+                Proceed to Installation →
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         PAGE 11 — INSTALLATION COST
+
+         JavaScript replaces the contents of this page using
+         renderInstallationCostPage().
+    ====================================================== -->
+
+    <section
+        class="page"
+        id="page11"
+    >
+
+        <div class="card">
+
+            <h2>
+                Installation Commissioning Cost
+            </h2>
+
+            <p>
+                Loading installation options…
+            </p>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         PAGE 12 — ACCESSORIES
+    ====================================================== -->
+
+    <section
+        class="page"
+        id="page12"
+    >
+
+        <div class="page-heading">
+
+            <span class="step-label">
+                Step 12
+            </span>
+
+            <h2>
+                Installation Commissioning &amp; Accessories
+            </h2>
+
+            <p>
+                Add accessories, additional works and optional
+                quotation items.
+            </p>
+
+        </div>
+
+
+        <div id="additionalItems"></div>
+
+
+        <div class="navigation-buttons">
+
+            <button
+                type="button"
+                class="secondary-button"
+                onclick="goToInstallationCosts()"
+            >
+                ← Back
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         PAGE 13 — CLIENT DETAILS
+    ====================================================== -->
+
+    <section
+        class="page"
+        id="page13"
+    >
+
+        <div class="page-heading">
+
+            <span class="step-label">
+                Step 13
+            </span>
+
+            <h2>
+                Client Details
+            </h2>
+
+            <p>
+                Enter the client and salesperson information
+                for the quotation.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <label for="clientName">
+                Client Name *
+            </label>
+
+            <input
+                type="text"
+                id="clientName"
+                autocomplete="organization"
+                placeholder="Enter client name"
+                required
+            >
+
+
+            <label for="installationLocation">
+                Installation Location *
+            </label>
+
+            <input
+                type="text"
+                id="installationLocation"
+                placeholder="Enter installation location"
+                required
+            >
+
+
+            <label for="salesPerson">
+                Salesperson
+            </label>
+
+            <input
+                type="text"
+                id="salesPerson"
+                autocomplete="name"
+                placeholder="Enter salesperson name"
+            >
+
+
+            <label for="salesPhone">
+                Salesperson Phone
+            </label>
+
+            <input
+                type="tel"
+                id="salesPhone"
+                autocomplete="tel"
+                placeholder="e.g. +254 700 000 000"
+            >
+
+
+            <label for="salesEmail">
+                Salesperson Email
+            </label>
+
+            <input
+                type="email"
+                id="salesEmail"
+                autocomplete="email"
+                value="hvacmsaintern@hotpoint.co.ke"
+                placeholder="name@example.com"
+            >
+
+        </div>
+
+
+        <div class="navigation-buttons">
+
+            <button
+                type="button"
+                class="secondary-button"
+                onclick="showPage(12)"
+            >
+                ← Back
+            </button>
+
+
+            <button
+                type="button"
+                class="primary-button"
+                onclick="proceedToQuotationPreview()"
+            >
+                Preview Quotation →
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         PAGE 14 — FINAL QUOTATION PREVIEW
+    ====================================================== -->
+
+    <section
+        class="page"
+        id="page14"
+    >
+
+        <div class="page-heading">
+
+            <span class="step-label">
+                Step 14
+            </span>
+
+            <h2>
+                Final Quotation Preview
+            </h2>
+
+            <p>
+                Review the quotation before generating the PDF.
+            </p>
+
+        </div>
+
+
+        <div id="quotationPreview"></div>
+
+    </section>
+
+
+</main>
+
+
+
+<footer class="site-footer">
+
+    <p>
+
+        Onsite Quotation —
+        © <span id="currentYear"></span>
+        Moses Ntella Taa
+
+    </p>
+
+    <p>
+
+        <a href="mailto:hvacmsaintern@hotpoint.co.ke">
+            hvacmsaintern@hotpoint.co.ke
+        </a>
+
+    </p>
+
+</footer>
+
+
+<!-- Keep script.js after all HTML elements. -->
+
+<script src="script.js"></script>
+
 
 </body>
+
 </html>
