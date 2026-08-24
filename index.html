@@ -18,18 +18,27 @@
 
     <link
         rel="stylesheet"
-        href="style.css?v=2"
+        href="style.css?v=4"
     >
 
     <!-- Mobile layout and progress bar styles -->
     <style>
         html {
             -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
         }
 
         body {
-            min-width: 320px;
+            width: 100%;
+            min-height: 100svh;
             overflow-x: hidden;
+            overflow-wrap: break-word;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
         }
 
         .top-header,
@@ -39,8 +48,18 @@
 
         .header-content,
         .app-container {
-            width: min(100% - 32px, 900px);
+            width: min(calc(100% - 32px), 900px);
             margin-inline: auto;
+        }
+
+        .app-container,
+        .page,
+        .card,
+        .input-row,
+        .navigation-buttons,
+        .button-group,
+        .quotation-document {
+            min-width: 0;
         }
 
         .header-content {
@@ -125,6 +144,10 @@
             font-size: 16px;
         }
 
+        textarea {
+            resize: vertical;
+        }
+
         button {
             min-height: 48px;
             touch-action: manipulation;
@@ -136,21 +159,34 @@
         }
 
         img,
-        canvas,
-        table {
+        canvas {
+            display: block;
+            height: auto;
             max-width: 100%;
         }
 
         #quotationPreview,
-        .table-wrapper {
+        .table-wrapper,
+        .quotation-document {
+            max-width: 100%;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            overflow-wrap: anywhere;
         }
 
         @media (max-width: 600px) {
             .header-content,
             .app-container {
-                width: min(100% - 24px, 900px);
+                width: calc(100% - 24px);
             }
 
             .top-header {
@@ -174,6 +210,11 @@
                 padding: 16px;
             }
 
+            .page-heading p,
+            .card p {
+                line-height: 1.55;
+            }
+
             .input-row,
             .navigation-buttons {
                 display: flex;
@@ -188,15 +229,79 @@
             }
 
             .navigation-buttons button,
+            .button-group button,
+            .preview-controls button,
             .full-width {
                 width: 100%;
             }
 
+            #quotationPreview table,
+            .table-wrapper table {
+                min-width: 620px;
+            }
+
+            .quotation-document {
+                padding: 14px;
+            }
+
             .site-footer {
-                padding-inline: 16px;
+                padding-right: max(16px, env(safe-area-inset-right));
+                padding-left: max(16px, env(safe-area-inset-left));
+                padding-bottom: max(16px, env(safe-area-inset-bottom));
                 text-align: center;
                 overflow-wrap: anywhere;
             }
+        }
+
+        @media (max-width: 380px) {
+            .header-content,
+            .app-container {
+                width: calc(100% - 16px);
+            }
+
+            .card,
+            .progress-panel,
+            .quotation-document {
+                padding: 12px;
+            }
+
+            .progress-details {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Keep buttons neutral until they are physically pressed. */
+        button,
+        button.primary-button,
+        button.secondary-button,
+        button.edit-button {
+            color: #075985 !important;
+            background: #ffffff !important;
+            border: 2px solid transparent !important;
+            box-shadow: none !important;
+        }
+
+        button:hover,
+        button:focus,
+        button:focus-visible,
+        button.primary-button:hover,
+        button.secondary-button:hover,
+        button.edit-button:hover {
+            color: #075985 !important;
+            background: #ffffff !important;
+            border-color: transparent !important;
+            box-shadow: none !important;
+            outline: none;
+        }
+
+        button:active,
+        button.primary-button:active,
+        button.secondary-button:active,
+        button.edit-button:active {
+            color: #075985 !important;
+            background: #ffffff !important;
+            border-color: #dc2626 !important;
+            box-shadow: none !important;
         }
     </style>
 
