@@ -21,6 +21,180 @@
         href="style.css"
     >
 
+    <!-- Mobile layout and progress bar styles -->
+    <style>
+        html {
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            min-width: 320px;
+            overflow-x: hidden;
+        }
+
+        .top-header,
+        .site-footer {
+            width: 100%;
+        }
+
+        .header-content,
+        .app-container {
+            width: min(100% - 32px, 900px);
+            margin-inline: auto;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .header-content h1,
+        .header-content p {
+            margin-inline: 0;
+        }
+
+        /* Center all page headings and step labels */
+
+        .page-heading {
+            text-align: center;
+        }
+
+        .step-label {
+            display: block;
+            width: fit-content;
+            margin: 0 auto 10px;
+            text-align: center;
+        }
+
+        /* Progress bar */
+
+        .progress-panel {
+            margin: 20px auto 24px;
+            padding: 14px 16px;
+            border: 1px solid #dbe5ec;
+            border-radius: 14px;
+            background: #ffffff;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.07);
+        }
+
+        .progress-details {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 9px;
+            color: #475569;
+            font-size: 0.88rem;
+            font-weight: 700;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 10px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #e2e8f0;
+        }
+
+        .progress-fill {
+            width: 7.14%;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(
+                90deg,
+                #075985,
+                #dc2626
+            );
+            transition: width 280ms ease;
+        }
+
+        input,
+        select,
+        textarea,
+        button {
+            max-width: 100%;
+            font: inherit;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            min-height: 48px;
+            font-size: 16px;
+        }
+
+        button {
+            min-height: 48px;
+            touch-action: manipulation;
+        }
+
+        img,
+        canvas,
+        table {
+            max-width: 100%;
+        }
+
+        #quotationPreview,
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        @media (max-width: 600px) {
+            .header-content,
+            .app-container {
+                width: min(100% - 24px, 900px);
+            }
+
+            .top-header {
+                padding-block: 16px;
+            }
+
+            .header-content h1 {
+                font-size: clamp(1.45rem, 7vw, 2rem);
+            }
+
+            .page-heading h2 {
+                font-size: clamp(1.3rem, 6vw, 1.75rem);
+            }
+
+            .progress-panel {
+                margin-block: 14px 18px;
+                padding: 12px;
+            }
+
+            .card {
+                padding: 16px;
+            }
+
+            .input-row,
+            .navigation-buttons {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .room-input-row {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) 48px;
+                align-items: center;
+            }
+
+            .navigation-buttons button,
+            .full-width {
+                width: 100%;
+            }
+
+            .site-footer {
+                padding-inline: 16px;
+                text-align: center;
+                overflow-wrap: anywhere;
+            }
+        }
+    </style>
+
     <!-- PDF libraries -->
     <script
         src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
@@ -36,16 +210,11 @@
     </script>
 </head>
 
-
 <body>
 
 <header class="top-header">
 
     <div class="header-content">
-
-        <div class="brand-mark">
-            OQ
-        </div>
 
         <div>
 
@@ -63,8 +232,47 @@
 
 </header>
 
-
 <main class="app-container">
+
+    <!-- ===============================================
+         PROGRESS BAR
+    ================================================ -->
+
+    <div
+        class="progress-panel"
+        id="quotationProgress"
+        role="progressbar"
+        aria-label="Quotation progress"
+        aria-valuemin="1"
+        aria-valuemax="14"
+        aria-valuenow="1"
+    >
+
+        <div class="progress-details">
+
+            <span id="progressStepText">
+                Step 1 of 14
+            </span>
+
+            <span id="progressPercentText">
+                7%
+            </span>
+
+        </div>
+
+        <div
+            class="progress-track"
+            aria-hidden="true"
+        >
+
+            <div
+                class="progress-fill"
+                id="progressFill"
+            ></div>
+
+        </div>
+
+    </div>
 
     <!-- ===============================================
          PAGE 1: ROOMS
@@ -91,7 +299,6 @@
 
         </div>
 
-
         <div class="card">
 
             <div id="roomInputContainer">
@@ -117,7 +324,6 @@
 
             </div>
 
-
             <button
                 type="button"
                 class="secondary-button full-width"
@@ -125,7 +331,6 @@
             >
                 + Add Another Room
             </button>
-
 
             <button
                 type="button"
@@ -138,7 +343,6 @@
         </div>
 
     </section>
-
 
     <!-- ===============================================
          PAGE 2: ROOM PREVIEW
@@ -165,9 +369,7 @@
 
         </div>
 
-
         <div id="roomPreview"></div>
-
 
         <div class="navigation-buttons">
 
@@ -178,7 +380,6 @@
             >
                 ← Back
             </button>
-
 
             <button
                 type="button"
@@ -191,7 +392,6 @@
         </div>
 
     </section>
-
 
     <!-- ===============================================
          PAGE 3: DIMENSIONS
@@ -218,9 +418,7 @@
 
         </div>
 
-
         <div id="dimensionInputs"></div>
-
 
         <div class="navigation-buttons">
 
@@ -231,7 +429,6 @@
             >
                 ← Back
             </button>
-
 
             <button
                 type="button"
@@ -244,7 +441,6 @@
         </div>
 
     </section>
-
 
     <!-- ===============================================
          PAGE 4: DIMENSION PREVIEW
@@ -271,12 +467,10 @@
 
         </div>
 
-
         <div
             class="card"
             id="dimensionPreview"
         ></div>
-
 
         <div class="navigation-buttons">
 
@@ -287,7 +481,6 @@
             >
                 ← Back
             </button>
-
 
             <button
                 type="button"
@@ -300,7 +493,6 @@
         </div>
 
     </section>
-
 
     <!-- ===============================================
          PAGE 5: COPPER AND DRAINAGE
@@ -327,9 +519,7 @@
 
         </div>
 
-
         <div id="copperInputs"></div>
-
 
         <div class="navigation-buttons">
 
@@ -340,7 +530,6 @@
             >
                 ← Back
             </button>
-
 
             <button
                 type="button"
@@ -353,7 +542,6 @@
         </div>
 
     </section>
-
 
     <!-- ===============================================
          PAGE 6: PIPE LENGTH PREVIEW
@@ -380,12 +568,10 @@
 
         </div>
 
-
         <div
             class="card"
             id="copperPreview"
         ></div>
-
 
         <div class="navigation-buttons">
 
@@ -396,7 +582,6 @@
             >
                 ← Back
             </button>
-
 
             <button
                 type="button"
@@ -409,7 +594,6 @@
         </div>
 
     </section>
-
 
     <!-- ===============================================
          PAGE 7: COOLING LOAD
@@ -436,9 +620,7 @@
 
         </div>
 
-
         <div id="coolingLoadInputs"></div>
-
 
         <div class="navigation-buttons">
 
@@ -449,7 +631,6 @@
             >
                 ← Back
             </button>
-
 
             <button
                 type="button"
@@ -462,7 +643,6 @@
         </div>
 
     </section>
-
 
     <!-- ===============================================
          PAGE 8: AC RECOMMENDATION
@@ -489,9 +669,7 @@
 
         </div>
 
-
         <div id="coolingLoadPreview"></div>
-
 
         <div class="navigation-buttons">
 
@@ -502,7 +680,6 @@
             >
                 ← Back
             </button>
-
 
             <button
                 type="button"
@@ -515,7 +692,6 @@
         </div>
 
     </section>
-
 
     <!-- ===============================================
          PAGE 9: AC PRICES
@@ -542,9 +718,7 @@
 
         </div>
 
-
         <div id="acPriceInputs"></div>
-
 
         <div class="navigation-buttons">
 
@@ -555,7 +729,6 @@
             >
                 ← Back
             </button>
-
 
             <button
                 type="button"
@@ -568,7 +741,6 @@
         </div>
 
     </section>
-
 
     <!-- ===============================================
          PAGE 10: MATERIAL RATES
@@ -596,7 +768,6 @@
 
         </div>
 
-
         <div class="card material-rate-card">
 
             <div class="form-group">
@@ -616,12 +787,10 @@
 
             </div>
 
-
             <!--
                 The flexible-cable dropdown and rate field
                 are inserted here automatically by script.js.
             -->
-
 
             <div class="form-group">
 
@@ -642,7 +811,6 @@
 
         </div>
 
-
         <div class="navigation-buttons">
 
             <button
@@ -652,7 +820,6 @@
             >
                 ← Back
             </button>
-
 
             <button
                 type="button"
@@ -666,7 +833,6 @@
 
     </section>
 
-
     <!-- ===============================================
          PAGE 11: INSTALLATION COST
          Content generated by script.js
@@ -676,7 +842,6 @@
         class="page"
         id="page11"
     ></section>
-
 
     <!-- ===============================================
          PAGE 12: ACCESSORIES
@@ -703,9 +868,7 @@
 
         </div>
 
-
         <div id="additionalItems"></div>
-
 
         <button
             type="button"
@@ -716,7 +879,6 @@
         </button>
 
     </section>
-
 
     <!-- ===============================================
          PAGE 13: CLIENT DETAILS
@@ -743,7 +905,6 @@
 
         </div>
 
-
         <div class="card client-details-form">
 
             <div class="form-group">
@@ -763,7 +924,6 @@
 
             </div>
 
-
             <div class="form-group">
 
                 <label for="installationLocation">
@@ -780,7 +940,6 @@
 
             </div>
 
-
             <div class="form-group">
 
                 <label for="salesPerson">
@@ -796,7 +955,6 @@
 
             </div>
 
-
             <div class="form-group">
 
                 <label for="salesPhone">
@@ -811,7 +969,6 @@
                 >
 
             </div>
-
 
             <div class="form-group">
 
@@ -830,7 +987,6 @@
 
         </div>
 
-
         <div class="navigation-buttons">
 
             <button
@@ -840,7 +996,6 @@
             >
                 ← Back
             </button>
-
 
             <button
                 type="button"
@@ -853,7 +1008,6 @@
         </div>
 
     </section>
-
 
     <!-- ===============================================
          PAGE 14: FINAL PREVIEW
@@ -880,13 +1034,11 @@
 
         </div>
 
-
         <div id="quotationPreview"></div>
 
     </section>
 
 </main>
-
 
 <footer class="site-footer">
 
@@ -901,6 +1053,86 @@
     </a>
 
 </footer>
+
+<!-- ===============================================
+     AUTOMATIC PROGRESS BAR
+================================================ -->
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const totalSteps = 14;
+
+        const progress =
+            document.getElementById("quotationProgress");
+
+        const progressFill =
+            document.getElementById("progressFill");
+
+        const stepText =
+            document.getElementById("progressStepText");
+
+        const percentText =
+            document.getElementById("progressPercentText");
+
+        const pages = Array.from(
+            document.querySelectorAll(
+                "section.page[id^='page']"
+            )
+        );
+
+        function updateProgress() {
+            const activePage = pages.find(function (page) {
+                return page.classList.contains("active");
+            });
+
+            if (!activePage) {
+                return;
+            }
+
+            const pageNumber = Number(
+                activePage.id.replace("page", "")
+            );
+
+            const currentStep = Math.min(
+                totalSteps,
+                Math.max(1, pageNumber || 1)
+            );
+
+            const percentage = Math.round(
+                (currentStep / totalSteps) * 100
+            );
+
+            progressFill.style.width =
+                percentage + "%";
+
+            stepText.textContent =
+                "Step " +
+                currentStep +
+                " of " +
+                totalSteps;
+
+            percentText.textContent =
+                percentage + "%";
+
+            progress.setAttribute(
+                "aria-valuenow",
+                String(currentStep)
+            );
+        }
+
+        const pageObserver =
+            new MutationObserver(updateProgress);
+
+        pages.forEach(function (page) {
+            pageObserver.observe(page, {
+                attributes: true,
+                attributeFilter: ["class"]
+            });
+        });
+
+        updateProgress();
+    });
+</script>
 
 </body>
 
