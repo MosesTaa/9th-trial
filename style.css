@@ -441,7 +441,7 @@ button {
 
     border:
         2px solid
-        var(--red);
+        transparent;
 
     border-radius: 11px;
 
@@ -469,13 +469,12 @@ button {
 button:focus,
 button:focus-visible {
     border-color:
-        var(--red);
+        transparent;
 
     outline: none;
 
     box-shadow:
-        0 0 0 4px
-        rgba(220, 38, 38, 0.18);
+        none;
 }
 
 
@@ -486,17 +485,16 @@ button:focus-visible {
 
 button:active {
     color:
-        #ffffff !important;
+        var(--primary) !important;
 
     background:
-        var(--red) !important;
+        #ffffff !important;
 
     border-color:
         var(--red) !important;
 
     box-shadow:
-        0 2px 5px
-        rgba(185, 28, 28, 0.24) !important;
+        none !important;
 
     transform:
         translateY(1px)
@@ -510,23 +508,22 @@ button:active {
 
 .primary-button {
     color:
-        #ffffff;
-
-    background:
         var(--primary);
 
+    background:
+        #ffffff;
+
     border-color:
-        var(--red);
+        transparent;
 
     box-shadow:
-        0 5px 12px
-        rgba(7, 89, 133, 0.18);
+        none;
 }
 
 
 .primary-button:hover {
     background:
-        var(--primary-dark);
+        #ffffff;
 }
 
 
@@ -543,17 +540,17 @@ button:active {
         #ffffff;
 
     border-color:
-        var(--red);
+        transparent;
 }
 
 
 .secondary-button:hover,
 .edit-button:hover {
     color:
-        var(--red-dark);
+        var(--primary);
 
     background:
-        var(--red-soft);
+        #ffffff;
 }
 
 
