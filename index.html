@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -15,59 +14,64 @@
         content="#075985"
     >
 
-    <title>
-        Onsite Quotation
-    </title>
+    <title>Onsite Quotation</title>
 
     <link
         rel="stylesheet"
         href="style.css"
     >
 
-
-    <!-- PDF LIBRARIES -->
+    <!-- PDF libraries -->
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+    </script>
 
     <script
-        src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
-    ></script>
+        src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js">
+    </script>
 
     <script
-        src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"
-    ></script>
-
+        src="script.js"
+        defer>
+    </script>
 </head>
 
 
 <body>
 
-
 <header class="top-header">
 
-    <div>
+    <div class="header-content">
 
-        <h1>
-            Onsite Quotation
-        </h1>
+        <div class="brand-mark">
+            OQ
+        </div>
 
-        <p>
-            HVAC Site Quotation System
-        </p>
+        <div>
+
+            <h1>
+                Onsite Quotation
+            </h1>
+
+            <p>
+                HVAC Site Quotation System
+            </p>
+
+        </div>
 
     </div>
 
 </header>
 
 
-
 <main class="app-container">
 
-
-    <!-- =====================================================
-         PAGE 1 — ROOMS
-    ====================================================== -->
+    <!-- ===============================================
+         PAGE 1: ROOMS
+    ================================================ -->
 
     <section
-        class="page active"
+        class="page"
         id="page1"
     >
 
@@ -78,11 +82,11 @@
             </span>
 
             <h2>
-                Rooms Requiring Air Conditioning
+                Add Rooms
             </h2>
 
             <p>
-                Add every room that will be included in the quotation.
+                Enter every room that requires air conditioning.
             </p>
 
         </div>
@@ -136,10 +140,9 @@
     </section>
 
 
-
-    <!-- =====================================================
-         PAGE 2 — ROOM PREVIEW
-    ====================================================== -->
+    <!-- ===============================================
+         PAGE 2: ROOM PREVIEW
+    ================================================ -->
 
     <section
         class="page"
@@ -157,7 +160,7 @@
             </h2>
 
             <p>
-                Rename or delete rooms before continuing.
+                Rename or remove rooms before continuing.
             </p>
 
         </div>
@@ -182,7 +185,7 @@
                 class="primary-button"
                 onclick="goToDimensions()"
             >
-                Proceed to Dimensions →
+                Proceed →
             </button>
 
         </div>
@@ -190,10 +193,9 @@
     </section>
 
 
-
-    <!-- =====================================================
-         PAGE 3 — ROOM DIMENSIONS
-    ====================================================== -->
+    <!-- ===============================================
+         PAGE 3: DIMENSIONS
+    ================================================ -->
 
     <section
         class="page"
@@ -244,10 +246,9 @@
     </section>
 
 
-
-    <!-- =====================================================
-         PAGE 4 — DIMENSIONS PREVIEW
-    ====================================================== -->
+    <!-- ===============================================
+         PAGE 4: DIMENSION PREVIEW
+    ================================================ -->
 
     <section
         class="page"
@@ -265,7 +266,7 @@
             </h2>
 
             <p>
-                Confirm the room dimensions and calculated areas.
+                Confirm the measurements and calculated areas.
             </p>
 
         </div>
@@ -293,7 +294,7 @@
                 class="primary-button"
                 onclick="goToCopper()"
             >
-                Proceed to Copper &amp; Drainage →
+                Proceed →
             </button>
 
         </div>
@@ -301,10 +302,9 @@
     </section>
 
 
-
-    <!-- =====================================================
-         PAGE 5 — COPPER AND DRAINAGE
-    ====================================================== -->
+    <!-- ===============================================
+         PAGE 5: COPPER AND DRAINAGE
+    ================================================ -->
 
     <section
         class="page"
@@ -322,7 +322,7 @@
             </h2>
 
             <p>
-                Enter the required lengths for every room.
+                Enter the measured pipe lengths for each room.
             </p>
 
         </div>
@@ -355,10 +355,9 @@
     </section>
 
 
-
-    <!-- =====================================================
-         PAGE 6 — COPPER AND DRAINAGE PREVIEW
-    ====================================================== -->
+    <!-- ===============================================
+         PAGE 6: PIPE LENGTH PREVIEW
+    ================================================ -->
 
     <section
         class="page"
@@ -372,11 +371,11 @@
             </span>
 
             <h2>
-                Copper &amp; Drainage Preview
+                Pipe Length Preview
             </h2>
 
             <p>
-                Confirm the lengths before calculating cooling loads.
+                Confirm copper and drainage quantities.
             </p>
 
         </div>
@@ -404,7 +403,7 @@
                 class="primary-button"
                 onclick="goToCoolingLoad()"
             >
-                Proceed to Cooling Load →
+                Proceed →
             </button>
 
         </div>
@@ -412,10 +411,9 @@
     </section>
 
 
-
-    <!-- =====================================================
-         PAGE 7 — COOLING LOAD
-    ====================================================== -->
+    <!-- ===============================================
+         PAGE 7: COOLING LOAD
+    ================================================ -->
 
     <section
         class="page"
@@ -429,11 +427,11 @@
             </span>
 
             <h2>
-                Cooling Load Factors
+                Cooling Load Factor
             </h2>
 
             <p>
-                Enter the BTU/hr per square metre factor for every room.
+                Set the BTU/hr per square metre factor for each room.
             </p>
 
         </div>
@@ -447,7 +445,7 @@
             <button
                 type="button"
                 class="secondary-button"
-                onclick="showPage(6)"
+                onclick="isSupplyOnly() ? showPage(4) : showPage(6)"
             >
                 ← Back
             </button>
@@ -458,7 +456,7 @@
                 class="primary-button"
                 onclick="previewCoolingLoad()"
             >
-                Preview AC Recommendations →
+                Preview Recommendation →
             </button>
 
         </div>
@@ -466,10 +464,9 @@
     </section>
 
 
-
-    <!-- =====================================================
-         PAGE 8 — AC RECOMMENDATIONS
-    ====================================================== -->
+    <!-- ===============================================
+         PAGE 8: AC RECOMMENDATION
+    ================================================ -->
 
     <section
         class="page"
@@ -483,12 +480,11 @@
             </span>
 
             <h2>
-                AC Recommendation Preview
+                AC Recommendation
             </h2>
 
             <p>
-                Adjust the capacity, type and brand for every
-                recommended AC unit.
+                Review or change capacity, AC type and brand.
             </p>
 
         </div>
@@ -521,10 +517,9 @@
     </section>
 
 
-
-    <!-- =====================================================
-         PAGE 9 — AC PRICES
-    ====================================================== -->
+    <!-- ===============================================
+         PAGE 9: AC PRICES
+    ================================================ -->
 
     <section
         class="page"
@@ -542,8 +537,7 @@
             </h2>
 
             <p>
-                Enter the unit price for each selected brand,
-                capacity and AC type combination.
+                Enter the unit price for each equipment combination.
             </p>
 
         </div>
@@ -568,7 +562,7 @@
                 class="primary-button"
                 onclick="saveACPrices()"
             >
-                Proceed to Material Rates →
+                Save &amp; Continue →
             </button>
 
         </div>
@@ -576,10 +570,9 @@
     </section>
 
 
-
-    <!-- =====================================================
-         PAGE 10 — MATERIAL RATES
-    ====================================================== -->
+    <!-- ===============================================
+         PAGE 10: MATERIAL RATES
+    ================================================ -->
 
     <section
         class="page"
@@ -597,40 +590,55 @@
             </h2>
 
             <p>
-                Enter the copper and drainage rates per metre.
+                Enter rates per metre. Flexible-cable length
+                automatically equals total copper length.
             </p>
 
         </div>
 
 
-        <div class="card">
+        <div class="card material-rate-card">
 
-            <label for="copperRate">
-                Copper Rate (KES/m)
-            </label>
+            <div class="form-group">
 
-            <input
-                type="number"
-                id="copperRate"
-                min="0"
-                step="0.01"
-                value="3200"
-                placeholder="e.g. 3200"
-            >
+                <label for="copperRate">
+                    Copper Rate per Metre (KES)
+                </label>
+
+                <input
+                    id="copperRate"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    inputmode="decimal"
+                    placeholder="e.g. 3200"
+                >
+
+            </div>
 
 
-            <label for="drainageRate">
-                Drainage Rate (KES/m)
-            </label>
+            <!--
+                The flexible-cable dropdown and rate field
+                are inserted here automatically by script.js.
+            -->
 
-            <input
-                type="number"
-                id="drainageRate"
-                min="0"
-                step="0.01"
-                value="0"
-                placeholder="e.g. 500"
-            >
+
+            <div class="form-group">
+
+                <label for="drainageRate">
+                    Drainage Rate per Metre (KES)
+                </label>
+
+                <input
+                    id="drainageRate"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    inputmode="decimal"
+                    placeholder="Enter drainage rate"
+                >
+
+            </div>
 
         </div>
 
@@ -651,7 +659,7 @@
                 class="primary-button"
                 onclick="saveMaterialRates()"
             >
-                Proceed to Installation →
+                Save &amp; Continue →
             </button>
 
         </div>
@@ -659,38 +667,20 @@
     </section>
 
 
-
-    <!-- =====================================================
-         PAGE 11 — INSTALLATION COST
-
-         JavaScript replaces the contents of this page using
-         renderInstallationCostPage().
-    ====================================================== -->
+    <!-- ===============================================
+         PAGE 11: INSTALLATION COST
+         Content generated by script.js
+    ================================================ -->
 
     <section
         class="page"
         id="page11"
-    >
-
-        <div class="card">
-
-            <h2>
-                Installation Commissioning Cost
-            </h2>
-
-            <p>
-                Loading installation options…
-            </p>
-
-        </div>
-
-    </section>
+    ></section>
 
 
-
-    <!-- =====================================================
-         PAGE 12 — ACCESSORIES
-    ====================================================== -->
+    <!-- ===============================================
+         PAGE 12: ACCESSORIES
+    ================================================ -->
 
     <section
         class="page"
@@ -708,8 +698,7 @@
             </h2>
 
             <p>
-                Add accessories, additional works and optional
-                quotation items.
+                Add optional accessories and quotation items.
             </p>
 
         </div>
@@ -718,25 +707,20 @@
         <div id="additionalItems"></div>
 
 
-        <div class="navigation-buttons">
-
-            <button
-                type="button"
-                class="secondary-button"
-                onclick="goToInstallationCosts()"
-            >
-                ← Back
-            </button>
-
-        </div>
+        <button
+            type="button"
+            class="secondary-button full-width"
+            onclick="showPage(11)"
+        >
+            ← Back to Installation Cost
+        </button>
 
     </section>
 
 
-
-    <!-- =====================================================
-         PAGE 13 — CLIENT DETAILS
-    ====================================================== -->
+    <!-- ===============================================
+         PAGE 13: CLIENT DETAILS
+    ================================================ -->
 
     <section
         class="page"
@@ -754,75 +738,95 @@
             </h2>
 
             <p>
-                Enter the client and salesperson information
-                for the quotation.
+                Enter the client, location and salesperson information.
             </p>
 
         </div>
 
 
-        <div class="card">
+        <div class="card client-details-form">
 
-            <label for="clientName">
-                Client Name *
-            </label>
+            <div class="form-group">
 
-            <input
-                type="text"
-                id="clientName"
-                autocomplete="organization"
-                placeholder="Enter client name"
-                required
-            >
+                <label for="clientName">
+                    Client Name
+                    <span class="required">*</span>
+                </label>
 
+                <input
+                    id="clientName"
+                    type="text"
+                    autocomplete="organization"
+                    placeholder="Enter client name"
+                    required
+                >
 
-            <label for="installationLocation">
-                Installation Location *
-            </label>
-
-            <input
-                type="text"
-                id="installationLocation"
-                placeholder="Enter installation location"
-                required
-            >
+            </div>
 
 
-            <label for="salesPerson">
-                Salesperson
-            </label>
+            <div class="form-group">
 
-            <input
-                type="text"
-                id="salesPerson"
-                autocomplete="name"
-                placeholder="Enter salesperson name"
-            >
+                <label for="installationLocation">
+                    Installation Location
+                    <span class="required">*</span>
+                </label>
 
+                <input
+                    id="installationLocation"
+                    type="text"
+                    placeholder="Enter project location"
+                    required
+                >
 
-            <label for="salesPhone">
-                Salesperson Phone
-            </label>
-
-            <input
-                type="tel"
-                id="salesPhone"
-                autocomplete="tel"
-                placeholder="e.g. +254 700 000 000"
-            >
+            </div>
 
 
-            <label for="salesEmail">
-                Salesperson Email
-            </label>
+            <div class="form-group">
 
-            <input
-                type="email"
-                id="salesEmail"
-                autocomplete="email"
-                value="hvacmsaintern@hotpoint.co.ke"
-                placeholder="name@example.com"
-            >
+                <label for="salesPerson">
+                    Salesperson
+                </label>
+
+                <input
+                    id="salesPerson"
+                    type="text"
+                    autocomplete="name"
+                    placeholder="Enter salesperson name"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="salesPhone">
+                    Phone Number
+                </label>
+
+                <input
+                    id="salesPhone"
+                    type="tel"
+                    autocomplete="tel"
+                    placeholder="e.g. +254 700 000 000"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="salesEmail">
+                    Email Address
+                </label>
+
+                <input
+                    id="salesEmail"
+                    type="email"
+                    autocomplete="email"
+                    placeholder="e.g. name@example.com"
+                >
+
+            </div>
 
         </div>
 
@@ -832,7 +836,7 @@
             <button
                 type="button"
                 class="secondary-button"
-                onclick="showPage(12)"
+                onclick="isSupplyOnly() ? showPage(9) : showPage(12)"
             >
                 ← Back
             </button>
@@ -851,10 +855,9 @@
     </section>
 
 
-
-    <!-- =====================================================
-         PAGE 14 — FINAL QUOTATION PREVIEW
-    ====================================================== -->
+    <!-- ===============================================
+         PAGE 14: FINAL PREVIEW
+    ================================================ -->
 
     <section
         class="page"
@@ -868,11 +871,11 @@
             </span>
 
             <h2>
-                Final Quotation Preview
+                Quotation Preview
             </h2>
 
             <p>
-                Review the quotation before generating the PDF.
+                Review the final quotation before generating the PDF.
             </p>
 
         </div>
@@ -882,36 +885,22 @@
 
     </section>
 
-
 </main>
-
 
 
 <footer class="site-footer">
 
     <p>
-
         Onsite Quotation —
         © <span id="currentYear"></span>
         Moses Ntella Taa
-
     </p>
 
-    <p>
-
-        <a href="mailto:hvacmsaintern@hotpoint.co.ke">
-            hvacmsaintern@hotpoint.co.ke
-        </a>
-
-    </p>
+    <a href="mailto:hvacmsaintern@hotpoint.co.ke">
+        hvacmsaintern@hotpoint.co.ke
+    </a>
 
 </footer>
-
-
-<!-- Keep script.js after all HTML elements. -->
-
-<script src="script.js"></script>
-
 
 </body>
 
