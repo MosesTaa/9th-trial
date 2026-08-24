@@ -1,386 +1,1046 @@
 :root {
     --primary: #075985;
     --primary-dark: #0c4a6e;
-    --secondary: #0891b2;
-    --accent: #f59e0b;
-    --success: #16a34a;
-    --danger: #dc2626;
-    --background: #eef7fb;
+    --secondary: #0e7490;
+
+    --red: #dc2626;
+    --red-dark: #b91c1c;
+    --red-soft: #fef2f2;
+
+    --background: #edf6fa;
     --card: #ffffff;
     --text: #172033;
     --muted: #64748b;
-    --border: #dbe5ec;
-    --shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
+    --border: #cbd5e1;
+
+    --shadow:
+        0 10px 28px
+        rgba(15, 23, 42, 0.09);
+
+    --radius: 16px;
 }
+
+
+/* =========================================================
+   GLOBAL
+   ========================================================= */
 
 * {
     box-sizing: border-box;
 }
 
+
 html {
     scroll-behavior: smooth;
 }
 
+
 body {
     margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+
+    color: var(--text);
+
     background:
         linear-gradient(
-            135deg,
-            #e0f2fe 0%,
-            #f8fafc 45%,
-            #ecfeff 100%
+            180deg,
+            #e0f2fe 0,
+            var(--background) 260px
         );
-    color: var(--text);
-    min-height: 100vh;
+
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    line-height: 1.5;
 }
 
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
 .top-header {
+    color: #ffffff;
+
     background:
         linear-gradient(
             135deg,
-            var(--primary-dark),
-            var(--secondary)
+            #075985,
+            #0e7490
         );
-    color: white;
-    padding: 24px 18px;
-    text-align: center;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+
+    box-shadow:
+        0 5px 18px
+        rgba(7, 89, 133, 0.24);
 }
+
+
+.header-content {
+    width:
+        min(
+            100% - 28px,
+            920px
+        );
+
+    min-height: 108px;
+
+    margin: auto;
+
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+
+.brand-mark {
+    width: 52px;
+    height: 52px;
+
+    flex: 0 0 52px;
+
+    display: grid;
+    place-items: center;
+
+    border:
+        2px solid
+        #ffffff;
+
+    border-radius: 15px;
+
+    font-size: 1.05rem;
+    font-weight: 900;
+}
+
 
 .top-header h1 {
     margin: 0;
-    font-size: 28px;
+
+    font-size:
+        clamp(
+            1.45rem,
+            5vw,
+            2rem
+        );
+
+    line-height: 1.15;
 }
+
 
 .top-header p {
-    margin: 7px 0 0;
-    opacity: 0.9;
-    font-size: 14px;
+    margin:
+        5px 0 0;
+
+    color: #e0f2fe;
+
+    font-size: 0.92rem;
 }
 
+
+/* =========================================================
+   APP LAYOUT
+   ========================================================= */
+
 .app-container {
-    width: 100%;
-    max-width: 850px;
-    margin: 0 auto;
-    padding: 25px 15px 40px;
+    width:
+        min(
+            100% - 24px,
+            920px
+        );
+
+    min-height:
+        calc(
+            100vh - 230px
+        );
+
+    margin:
+        26px auto 40px;
 }
+
 
 .page {
     display: none;
-    animation: fadeIn 0.25s ease;
+
+    animation:
+        page-in
+        0.24s
+        ease
+        both;
 }
+
 
 .page.active {
     display: block;
 }
 
-@keyframes fadeIn {
+
+@keyframes page-in {
+
     from {
         opacity: 0;
-        transform: translateY(8px);
+
+        transform:
+            translateY(8px);
     }
 
     to {
         opacity: 1;
-        transform: translateY(0);
+
+        transform:
+            translateY(0);
     }
+
 }
+
+
+/* =========================================================
+   PAGE HEADINGS
+   ========================================================= */
 
 .page-heading {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 20px;
+    margin:
+        0 2px 18px;
 }
 
+
 .page-heading h2 {
-    margin: 0 0 5px;
-    font-size: 23px;
+    margin:
+        5px 0 4px;
+
+    color:
+        var(--primary-dark);
+
+    font-size:
+        clamp(
+            1.35rem,
+            5vw,
+            1.8rem
+        );
 }
+
 
 .page-heading p {
     margin: 0;
-    color: var(--muted);
-    font-size: 14px;
+
+    color:
+        var(--muted);
 }
 
-.step-number {
-    width: 45px;
-    height: 45px;
-    min-width: 45px;
-    border-radius: 50%;
-    background: linear-gradient(
-        135deg,
-        var(--primary),
-        var(--secondary)
-    );
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    font-size: 18px;
-    box-shadow: 0 5px 15px rgba(8, 145, 178, 0.25);
+
+.step-label {
+    display: inline-block;
+
+    padding:
+        4px 10px;
+
+    border-radius: 999px;
+
+    color:
+        var(--primary);
+
+    background:
+        #e0f2fe;
+
+    font-size: 0.76rem;
+    font-weight: 800;
+
+    letter-spacing: 0.04em;
+
+    text-transform: uppercase;
 }
 
-.card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: var(--shadow);
-    margin-bottom: 20px;
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+
+.card,
+.room-card,
+.quotation-document {
+    margin-bottom: 16px;
+
+    padding: 18px;
+
+    border:
+        1px solid
+        #dbe7ee;
+
+    border-radius:
+        var(--radius);
+
+    background:
+        var(--card);
+
+    box-shadow:
+        var(--shadow);
 }
 
-.card h3 {
+
+.card h2,
+.card h3,
+.room-card h3 {
     margin-top: 0;
+
+    color:
+        var(--primary-dark);
 }
 
-.input-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
-}
 
-.input-row input {
-    flex: 1;
-}
-
-input,
-select {
-    width: 100%;
-    padding: 13px 14px;
-    margin-top: 7px;
-    margin-bottom: 15px;
-    border: 1px solid #cbd5e1;
-    border-radius: 10px;
-    outline: none;
-    background: #fff;
-    color: var(--text);
-    font-size: 16px;
-    transition: 0.2s;
-}
-
-input:focus,
-select:focus {
-    border-color: var(--secondary);
-    box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.12);
-}
+/* =========================================================
+   LABELS
+   ========================================================= */
 
 label {
     display: block;
-    font-weight: 600;
-    margin-bottom: 5px;
+
+    margin:
+        0 0 15px;
+
+    color: #334155;
+
+    font-size: 0.92rem;
+    font-weight: 750;
 }
 
-.primary-button,
-.secondary-button,
-.danger-button,
-.edit-button,
-.remove-input {
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: 0.2s;
+
+.required {
+    color:
+        var(--red);
 }
+
+
+small {
+    color:
+        var(--muted);
+}
+
+
+.form-group {
+    margin-bottom: 17px;
+}
+
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+
+/* =========================================================
+   INPUTS AND DROPDOWNS
+   ========================================================= */
+
+input:not([type="checkbox"]),
+select,
+textarea {
+    width: 100%;
+    min-height: 50px;
+
+    margin-top: 7px;
+
+    padding:
+        11px 13px;
+
+    color:
+        var(--text);
+
+    background:
+        #ffffff;
+
+    border:
+        2px solid
+        var(--border);
+
+    border-radius: 11px;
+
+    outline: none;
+
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        background-color 0.18s ease;
+}
+
+
+select {
+    cursor: pointer;
+
+    appearance: auto;
+}
+
+
+input:not([type="checkbox"]):hover,
+select:hover,
+textarea:hover {
+    border-color: #94a3b8;
+}
+
+
+/*
+   Input boxes and dropdowns get red edges
+   when selected or focused.
+*/
+
+input:not([type="checkbox"]):focus,
+input:not([type="checkbox"]):focus-visible,
+select:focus,
+select:focus-visible,
+textarea:focus,
+textarea:focus-visible {
+    border-color:
+        var(--red);
+
+    background:
+        #ffffff;
+
+    box-shadow:
+        0 0 0 4px
+        rgba(220, 38, 38, 0.14);
+}
+
+
+/* =========================================================
+   CHECKBOXES
+   ========================================================= */
+
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+
+    margin:
+        0 8px 0 0;
+
+    vertical-align: middle;
+
+    accent-color:
+        var(--red);
+}
+
+
+/* =========================================================
+   ALL BUTTONS
+   ========================================================= */
+
+button {
+    min-height: 48px;
+
+    padding:
+        11px 17px;
+
+    border:
+        2px solid
+        var(--red);
+
+    border-radius: 11px;
+
+    cursor: pointer;
+
+    font-weight: 800;
+
+    transition:
+        color 0.13s ease,
+        background-color 0.13s ease,
+        border-color 0.13s ease,
+        transform 0.08s ease,
+        box-shadow 0.13s ease;
+
+    -webkit-tap-highlight-color:
+        transparent;
+}
+
+
+/*
+   When a button is selected with the keyboard,
+   mouse or touchscreen, it receives red edges.
+*/
+
+button:focus,
+button:focus-visible {
+    border-color:
+        var(--red);
+
+    outline: none;
+
+    box-shadow:
+        0 0 0 4px
+        rgba(220, 38, 38, 0.18);
+}
+
+
+/*
+   Every button becomes completely red
+   while it is being pressed.
+*/
+
+button:active {
+    color:
+        #ffffff !important;
+
+    background:
+        var(--red) !important;
+
+    border-color:
+        var(--red) !important;
+
+    box-shadow:
+        0 2px 5px
+        rgba(185, 28, 28, 0.24) !important;
+
+    transform:
+        translateY(1px)
+        scale(0.99);
+}
+
+
+/* =========================================================
+   PRIMARY BUTTON
+   ========================================================= */
 
 .primary-button {
-    background: linear-gradient(
-        135deg,
-        var(--primary),
-        var(--secondary)
-    );
-    color: white;
-    padding: 14px 18px;
-    margin-top: 12px;
+    color:
+        #ffffff;
+
+    background:
+        var(--primary);
+
+    border-color:
+        var(--red);
+
+    box-shadow:
+        0 5px 12px
+        rgba(7, 89, 133, 0.18);
 }
+
 
 .primary-button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 15px rgba(7, 89, 133, 0.25);
+    background:
+        var(--primary-dark);
 }
 
-.secondary-button {
-    background: #e0f2fe;
-    color: var(--primary-dark);
-    padding: 12px 16px;
-    margin-top: 10px;
-}
 
-.secondary-button:hover {
-    background: #bae6fd;
-}
+/* =========================================================
+   SECONDARY AND EDIT BUTTONS
+   ========================================================= */
 
-.danger-button {
-    background: #fee2e2;
-    color: var(--danger);
-    padding: 9px 12px;
-}
-
+.secondary-button,
 .edit-button {
-    background: #fef3c7;
-    color: #92400e;
-    padding: 9px 12px;
+    color:
+        var(--primary);
+
+    background:
+        #ffffff;
+
+    border-color:
+        var(--red);
 }
 
-.remove-input {
-    width: 45px;
-    height: 45px;
-    background: #fee2e2;
-    color: var(--danger);
-    font-size: 22px;
+
+.secondary-button:hover,
+.edit-button:hover {
+    color:
+        var(--red-dark);
+
+    background:
+        var(--red-soft);
 }
+
+
+/* =========================================================
+   DELETE AND REMOVE BUTTONS
+   ========================================================= */
+
+.danger-button,
+.remove-input {
+    color:
+        #ffffff;
+
+    background:
+        var(--red);
+
+    border-color:
+        var(--red);
+}
+
+
+.danger-button:hover,
+.remove-input:hover {
+    background:
+        var(--red-dark);
+
+    border-color:
+        var(--red-dark);
+}
+
 
 .full-width {
     width: 100%;
+
+    margin-top: 12px;
 }
 
-.room-card,
-.preview-item,
-.price-card {
-    background: #f8fafc;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 12px;
-}
 
-.room-card {
+/* =========================================================
+   BUTTON LAYOUTS
+   ========================================================= */
+
+.navigation-buttons,
+.preview-controls,
+.button-group {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     gap: 10px;
 }
 
-.room-name {
-    font-weight: bold;
-    font-size: 16px;
+
+.navigation-buttons,
+.preview-controls {
+    justify-content:
+        space-between;
+
+    margin-top: 18px;
 }
 
-.button-group {
+
+.navigation-buttons > button,
+.preview-controls > button {
+    flex: 1;
+}
+
+
+/* =========================================================
+   ROOM INPUT ROW
+   ========================================================= */
+
+.input-row {
     display: flex;
-    gap: 7px;
-    flex-wrap: wrap;
+    align-items: center;
+    gap: 9px;
+
+    margin-bottom: 11px;
 }
 
-.info-box {
-    background: #e0f2fe;
-    border: 1px solid #bae6fd;
-    color: #075985;
-    padding: 14px;
-    border-radius: 12px;
-    margin: 15px 0;
-    line-height: 1.6;
+
+.input-row input {
+    margin-top: 0;
 }
+
+
+.remove-input {
+    width: 50px;
+    min-width: 50px;
+
+    padding: 0;
+
+    font-size: 1.45rem;
+}
+
+
+/* =========================================================
+   ROOM PREVIEW
+   ========================================================= */
+
+.room-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+}
+
+
+.room-name {
+    font-weight: 850;
+}
+
+
+.button-group button {
+    min-height: 40px;
+
+    padding:
+        7px 12px;
+}
+
+
+/* =========================================================
+   INFORMATION BOXES
+   ========================================================= */
+
+.info-box,
+.empty-message {
+    margin:
+        12px 0;
+
+    padding: 13px;
+
+    color: #164e63;
+
+    background: #ecfeff;
+
+    border:
+        1px solid
+        #a5f3fc;
+
+    border-radius: 11px;
+}
+
 
 .empty-message {
-    padding: 20px;
+    color:
+        var(--muted);
+
     text-align: center;
-    color: var(--muted);
+
+    background:
+        #f8fafc;
+
+    border-color:
+        var(--border);
 }
 
-.success-card {
-    text-align: center;
-    padding: 40px 20px;
+
+/* =========================================================
+   AC RECOMMENDATION
+   ========================================================= */
+
+.ac-recommendation-unit {
+    margin:
+        13px 0;
+
+    padding: 15px;
+
+    background:
+        #f8fafc;
+
+    border:
+        1px solid
+        #dbe5ec;
+
+    border-radius: 12px;
 }
 
-.success-icon {
-    width: 70px;
-    height: 70px;
-    margin: 0 auto 20px;
-    border-radius: 50%;
-    background: #dcfce7;
-    color: var(--success);
+
+.ac-recommendation-unit h4 {
+    margin:
+        0 0 12px;
+
+    color:
+        var(--red-dark);
+}
+
+
+/* =========================================================
+   TABLES
+   ========================================================= */
+
+table {
+    width: 100%;
+
+    border-collapse:
+        collapse;
+}
+
+
+th,
+td {
+    padding: 10px;
+
+    border:
+        1px solid
+        #dbe5ec;
+
+    text-align: left;
+
+    vertical-align: top;
+}
+
+
+th {
+    color:
+        #ffffff;
+
+    background:
+        var(--primary);
+
+    font-size: 0.82rem;
+}
+
+
+td {
+    font-size: 0.86rem;
+}
+
+
+.number {
+    text-align: right;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   QUOTATION PREVIEW
+   ========================================================= */
+
+.quotation-document {
+    overflow: hidden;
+
+    padding: 22px;
+}
+
+
+.quotation-document > h1 {
+    margin:
+        0 0 20px;
+
+    color:
+        var(--primary);
+
+    text-align: center;
+}
+
+
+.quotation-section {
+    margin:
+        0 0 22px;
+}
+
+
+.quotation-section h3 {
+    margin:
+        0 0 10px;
+
+    color:
+        var(--primary-dark);
+
+    font-size: 1rem;
+}
+
+
+.client-table td:first-child {
+    width: 34%;
+
+    color:
+        var(--primary-dark);
+
+    font-weight: 850;
+}
+
+
+.grand-total {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 40px;
-    font-weight: bold;
+    justify-content: space-between;
+    gap: 15px;
+
+    padding: 14px;
+
+    color:
+        #ffffff;
+
+    background:
+        var(--primary);
+
+    border-radius: 9px;
+
+    font-weight: 900;
 }
 
-.success-card h2 {
-    margin-bottom: 10px;
-}
 
-.success-card p {
-    color: var(--muted);
-}
+/* =========================================================
+   FOOTER
+   ========================================================= */
 
 .site-footer {
+    padding:
+        24px 15px 30px;
+
+    color:
+        var(--muted);
+
     text-align: center;
-    padding: 25px 15px;
-    color: var(--muted);
-    font-size: 13px;
+
+    font-size: 0.85rem;
 }
+
 
 .site-footer p {
-    margin: 5px 0;
+    margin:
+        0 0 4px;
 }
 
+
 .site-footer a {
-    color: var(--primary);
+    color:
+        var(--primary);
+
+    font-weight: 750;
+
     text-decoration: none;
 }
 
-.site-footer a:hover {
-    text-decoration: underline;
-}
 
-@media (max-width: 600px) {
+/* =========================================================
+   MOBILE
+   ========================================================= */
 
-    .top-header {
-        padding: 20px 14px;
-    }
-
-    .top-header h1 {
-        font-size: 24px;
-    }
+@media (max-width: 620px) {
 
     .app-container {
-        padding: 18px 10px 30px;
+        width:
+            min(
+                100% - 18px,
+                920px
+            );
+
+        margin-top: 18px;
     }
 
-    .card {
-        padding: 15px;
+
+    .header-content {
+        width:
+            min(
+                100% - 22px,
+                920px
+            );
+
+        min-height: 94px;
+    }
+
+
+    .brand-mark {
+        width: 45px;
+        height: 45px;
+
+        flex-basis: 45px;
+
+        border-radius: 12px;
+    }
+
+
+    .card,
+    .room-card,
+    .quotation-document {
+        padding: 14px;
+
         border-radius: 13px;
     }
 
-    .page-heading {
-        gap: 10px;
-    }
-
-    .page-heading h2 {
-        font-size: 19px;
-    }
-
-    .step-number {
-        width: 40px;
-        height: 40px;
-        min-width: 40px;
-        font-size: 16px;
-    }
 
     .room-card {
-        align-items: flex-start;
-        flex-direction: column;
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
     }
 
-    .button-group {
+
+    .room-card .button-group {
         width: 100%;
     }
 
-    .button-group button {
+
+    .room-card .button-group button {
         flex: 1;
     }
 
-    .input-row {
-        align-items: center;
+
+    .navigation-buttons,
+    .preview-controls {
+        flex-direction:
+            column-reverse;
     }
 
-    .primary-button,
-    .secondary-button {
-        min-height: 46px;
+
+    .navigation-buttons > button,
+    .preview-controls > button {
+        width: 100%;
     }
+
+
+    th,
+    td {
+        padding:
+            8px 7px;
+
+        font-size: 0.75rem;
+    }
+
+
+    .quotation-document {
+        margin-inline: -2px;
+    }
+
+
+    .grand-total {
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+    }
+
+}
+
+
+/* =========================================================
+   PRINTING
+   ========================================================= */
+
+@media print {
+
+    body {
+        background:
+            #ffffff;
+    }
+
+
+    .top-header,
+    .page-heading,
+    .preview-controls,
+    .site-footer {
+        display:
+            none !important;
+    }
+
+
+    .app-container {
+        width: 100%;
+
+        margin: 0;
+    }
+
+
+    .page {
+        display:
+            none !important;
+    }
+
+
+    #page14.active {
+        display:
+            block !important;
+    }
+
+
+    .quotation-document {
+        margin: 0;
+        padding: 0;
+
+        border: 0;
+
+        box-shadow: none;
+    }
+
 }
