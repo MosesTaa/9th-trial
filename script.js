@@ -27,16 +27,26 @@ if (
 
 let quotation = {
 
+    quotationType: "",
+
     rooms: [],
 
     copperRate: 3200,
 
+    flexibleCableType: "1.5mm 3 core flexible cable",
+
+    flexibleCableRate: 0,
+
     drainageRate: 0,
 
     installationRegion: "",
+
     acType: "",
+
     installationUnitCost: 0,
+
     installationUnitCount: 0,
+
     installationTotal: 0,
 
     additionalItems: [],
@@ -70,10 +80,15 @@ let quotation = {
 const AC_CAPACITIES = [
 
     9000,
+
     12000,
+
     18000,
+
     24000,
+
     36000,
+
     48000
 
 ];
@@ -100,21 +115,80 @@ function showPage(pageNumber) {
         );
 
 
+    /* Generated here so existing HTML pages are not renumbered. */
+
+    if (!page && pageNumber === 0) {
+
+        page = document.createElement("section");
+
+        page.id = "page0";
+
+        page.className = "page";
+
+        page.innerHTML = `
+
+            <div class="card quotation-welcome-card">
+
+                <h2>
+                    Welcome to Onsite Quotation
+                </h2>
+
+                <p>
+                    Please choose the type of quotation you are looking for.
+                </p>
+
+                <div class="quotation-type-options">
+
+                    <button
+                        type="button"
+                        class="primary-button full-width"
+                        onclick="selectQuotationType('supply-only')"
+                    >
+                        Supply Only
+                    </button>
+
+                    <button
+                        type="button"
+                        class="secondary-button full-width"
+                        onclick="selectQuotationType('supply-and-commissioning')"
+                    >
+                        Supply and Commissioning
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
+
+        (
+            document.querySelector("main") ||
+            document.body
+        ).prepend(page);
+
+    }
+
+
     /*
        Page 15 is created dynamically because the original
-       HTML has pages 1-14. This keeps the existing HTML
-       unchanged while allowing the new installation page
-       and quotation-preview order.
+       HTML has pages 1–14.
     */
 
     if (!page && pageNumber === 15) {
 
-        page = document.createElement("section");
+        page =
+            document.createElement(
+                "section"
+            );
 
-        page.id = "page15";
-        page.className = "page";
+        page.id =
+            "page15";
+
+        page.className =
+            "page";
 
         page.innerHTML = `
+
             <div class="card">
 
                 <h2>
@@ -134,9 +208,11 @@ function showPage(pageNumber) {
                 </button>
 
             </div>
+
         `;
 
         document.body.appendChild(page);
+
     }
 
 
@@ -148,6 +224,7 @@ function showPage(pageNumber) {
         );
 
         return;
+
     }
 
 
@@ -161,6 +238,107 @@ function showPage(pageNumber) {
         behavior: "smooth"
 
     });
+
+}
+
+
+/* =========================================================
+   QUOTATION TYPE
+   ========================================================= */
+
+function isSupplyOnly() {
+
+    return (
+        quotation.quotationType ===
+        "supply-only"
+    );
+
+}
+
+
+function selectQuotationType(type) {
+
+    const allowedTypes = [
+
+        "supply-only",
+
+        "supply-and-commissioning"
+
+    ];
+
+
+    if (!allowedTypes.includes(type)) {
+
+        return;
+
+    }
+
+
+    quotation.quotationType =
+        type;
+
+
+    if (isSupplyOnly()) {
+
+        quotation.rooms.forEach(room => {
+
+            room.copper =
+                0;
+
+            room.drainage =
+                0;
+
+        });
+
+
+        quotation.copperRate =
+            0;
+
+        quotation.flexibleCableRate =
+            0;
+
+        quotation.drainageRate =
+            0;
+
+        quotation.installationRegion =
+            "";
+
+        quotation.acType =
+            "";
+
+        quotation.installationUnitCost =
+            0;
+
+        quotation.installationUnitCount =
+            0;
+
+        quotation.installationTotal =
+            0;
+
+        quotation.additionalItems =
+            [];
+
+        quotation.includePreliminaries =
+            false;
+
+        quotation.includeAsBuiltDrawing =
+            false;
+
+    } else {
+
+        quotation.copperRate =
+            quotation.copperRate ||
+            3200;
+
+        quotation.flexibleCableType =
+            quotation.flexibleCableType ||
+            "1.5mm 3 core flexible cable";
+
+    }
+
+
+    showPage(1);
+
 }
 
 
@@ -171,7 +349,8 @@ function showPage(pageNumber) {
 function money(value) {
 
     const amount =
-        Number(value) || 0;
+        Number(value) ||
+        0;
 
 
     return (
@@ -179,36 +358,53 @@ function money(value) {
         "KES " +
 
         amount.toLocaleString(
+
             "en-KE",
+
             {
+
                 minimumFractionDigits: 2,
+
                 maximumFractionDigits: 2
+
             }
+
         )
 
     );
+
 }
 
 
 function number(value) {
 
     const amount =
-        Number(value) || 0;
+        Number(value) ||
+        0;
 
 
     return amount.toLocaleString(
+
         "en-KE",
+
         {
+
             minimumFractionDigits: 2,
+
             maximumFractionDigits: 2
+
         }
+
     );
+
 }
 
 
 function escapeHTML(value) {
 
-    return String(value ?? "")
+    return String(
+        value ?? ""
+    )
 
         .replace(
             /&/g,
@@ -234,6 +430,7 @@ function escapeHTML(value) {
             /'/g,
             "&#039;"
         );
+
 }
 
 
@@ -250,11 +447,17 @@ function addRoomInput() {
         );
 
 
-    if (!container) return;
+    if (!container) {
+
+        return;
+
+    }
 
 
     const row =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
 
     row.className =
@@ -283,7 +486,10 @@ function addRoomInput() {
     container.appendChild(row);
 
 
-    row.querySelector("input")?.focus();
+    row
+        .querySelector("input")
+        ?.focus();
+
 }
 
 
@@ -298,21 +504,28 @@ function removeRoomInput(button) {
     if (rows.length <= 1) {
 
         const input =
-            button.parentElement
+            button
+                .parentElement
                 .querySelector("input");
 
 
         if (input) {
 
-            input.value = "";
+            input.value =
+                "";
 
         }
 
+
         return;
+
     }
 
 
-    button.parentElement.remove();
+    button
+        .parentElement
+        .remove();
+
 }
 
 
@@ -324,7 +537,8 @@ function saveRooms() {
         );
 
 
-    const names = [];
+    const names =
+        [];
 
 
     inputs.forEach(input => {
@@ -349,6 +563,7 @@ function saveRooms() {
         );
 
         return;
+
     }
 
 
@@ -376,7 +591,7 @@ function saveRooms() {
             /*
                Each room can have one or more AC units.
                Individual capacities, types and brands
-               will be stored in this array.
+               are stored in this array.
             */
 
             acUnits: []
@@ -388,6 +603,7 @@ function saveRooms() {
 
 
     showPage(2);
+
 }
 
 
@@ -404,7 +620,11 @@ function renderRoomPreview() {
         );
 
 
-    if (!container) return;
+    if (!container) {
+
+        return;
+
+    }
 
 
     if (
@@ -420,6 +640,7 @@ function renderRoomPreview() {
         `;
 
         return;
+
     }
 
 
@@ -437,7 +658,10 @@ function renderRoomPreview() {
                             <span class="room-name">
 
                                 ${index + 1}.
-                                ${escapeHTML(room.name)}
+
+                                ${escapeHTML(
+                                    room.name
+                                )}
 
                             </span>
 
@@ -471,6 +695,7 @@ function renderRoomPreview() {
             )
 
             .join("");
+
 }
 
 
@@ -489,8 +714,11 @@ function renameRoom(index) {
 
     const newName =
         prompt(
+
             "Enter the new room name:",
+
             currentName
+
         );
 
 
@@ -504,7 +732,9 @@ function renameRoom(index) {
 
 
         renderRoomPreview();
+
     }
+
 }
 
 
@@ -528,6 +758,7 @@ function deleteRoom(index) {
     ) {
 
         return;
+
     }
 
 
@@ -548,11 +779,14 @@ function deleteRoom(index) {
 
         showPage(1);
 
+
         return;
+
     }
 
 
     renderRoomPreview();
+
 }
 
 
@@ -566,9 +800,12 @@ function goToDimensions() {
             "Please add at least one room."
         );
 
+
         showPage(1);
 
+
         return;
+
     }
 
 
@@ -576,6 +813,7 @@ function goToDimensions() {
 
 
     showPage(3);
+
 }
 
 
@@ -592,7 +830,11 @@ function renderDimensionInputs() {
         );
 
 
-    if (!container) return;
+    if (!container) {
+
+        return;
+
+    }
 
 
     container.innerHTML =
@@ -605,8 +847,13 @@ function renderDimensionInputs() {
                     <div class="card">
 
                         <h3>
+
                             ${index + 1}.
-                            ${escapeHTML(room.name)}
+
+                            ${escapeHTML(
+                                room.name
+                            )}
+
                         </h3>
 
 
@@ -649,8 +896,13 @@ function renderDimensionInputs() {
                             <strong
                                 id="area-${index}"
                             >
-                                ${number(room.area)}
+
+                                ${number(
+                                    room.area
+                                )}
+
                                 m²
+
                             </strong>
 
                         </div>
@@ -664,6 +916,7 @@ function renderDimensionInputs() {
 
 
     quotation.rooms.forEach(
+
         (room, index) => {
 
             document
@@ -671,9 +924,14 @@ function renderDimensionInputs() {
                     `length-${index}`
                 )
                 ?.addEventListener(
+
                     "input",
+
                     () =>
-                        updateAreaPreview(index)
+                        updateAreaPreview(
+                            index
+                        )
+
                 );
 
 
@@ -682,13 +940,20 @@ function renderDimensionInputs() {
                     `width-${index}`
                 )
                 ?.addEventListener(
+
                     "input",
+
                     () =>
-                        updateAreaPreview(index)
+                        updateAreaPreview(
+                            index
+                        )
+
                 );
 
         }
+
     );
+
 }
 
 
@@ -696,22 +961,27 @@ function updateAreaPreview(index) {
 
     const length =
         Number(
+
             document.getElementById(
                 `length-${index}`
             )?.value
+
         );
 
 
     const width =
         Number(
+
             document.getElementById(
                 `width-${index}`
             )?.value
+
         );
 
 
     const area =
-        length * width;
+        length *
+        width;
 
 
     const output =
@@ -726,30 +996,37 @@ function updateAreaPreview(index) {
             `${number(area)} m²`;
 
     }
+
 }
 
 
 function previewDimensions() {
 
-    let valid = true;
+    let valid =
+        true;
 
 
     quotation.rooms.forEach(
+
         (room, index) => {
 
             const length =
                 Number(
+
                     document.getElementById(
                         `length-${index}`
                     )?.value
+
                 );
 
 
             const width =
                 Number(
+
                     document.getElementById(
                         `width-${index}`
                     )?.value
+
                 );
 
 
@@ -760,22 +1037,28 @@ function previewDimensions() {
                 width <= 0
             ) {
 
-                valid = false;
+                valid =
+                    false;
 
                 return;
+
             }
 
 
             room.length =
                 length;
 
+
             room.width =
                 width;
 
+
             room.area =
-                length * width;
+                length *
+                width;
 
         }
+
     );
 
 
@@ -785,7 +1068,9 @@ function previewDimensions() {
             "Please enter valid length and width for every room."
         );
 
+
         return;
+
     }
 
 
@@ -793,6 +1078,7 @@ function previewDimensions() {
 
 
     showPage(4);
+
 }
 
 
@@ -804,7 +1090,11 @@ function renderDimensionPreview() {
         );
 
 
-    if (!container) return;
+    if (!container) {
+
+        return;
+
+    }
 
 
     container.innerHTML = `
@@ -841,30 +1131,51 @@ function renderDimensionPreview() {
                 <tbody>
 
                     ${
+
                         quotation.rooms
+
                             .map(room => `
 
                                 <tr>
 
                                     <td>
-                                        ${escapeHTML(room.name)}
+
+                                        ${escapeHTML(
+                                            room.name
+                                        )}
+
                                     </td>
 
                                     <td class="number">
-                                        ${number(room.length)}
+
+                                        ${number(
+                                            room.length
+                                        )}
+
                                         m
+
                                     </td>
 
                                     <td class="number">
-                                        ${number(room.width)}
+
+                                        ${number(
+                                            room.width
+                                        )}
+
                                         m
+
                                     </td>
 
                                     <td class="number">
 
                                         <strong>
-                                            ${number(room.area)}
+
+                                            ${number(
+                                                room.area
+                                            )}
+
                                             m²
+
                                         </strong>
 
                                     </td>
@@ -872,7 +1183,9 @@ function renderDimensionPreview() {
                                 </tr>
 
                             `)
+
                             .join("")
+
                     }
 
                 </tbody>
@@ -882,7 +1195,9 @@ function renderDimensionPreview() {
         </div>
 
     `;
+
 }
+
 
 /* =========================================================
    SECTION 2 OF 7
@@ -897,6 +1212,27 @@ function renderDimensionPreview() {
 
 function goToCopper() {
 
+    if (isSupplyOnly()) {
+
+        quotation.rooms.forEach(room => {
+
+            room.copper =
+                0;
+
+            room.drainage =
+                0;
+
+        });
+
+
+        goToCoolingLoad();
+
+
+        return;
+
+    }
+
+
     if (
         !quotation.rooms ||
         quotation.rooms.length === 0
@@ -906,9 +1242,12 @@ function goToCopper() {
             "Please add rooms before entering copper and drainage lengths."
         );
 
+
         showPage(1);
 
+
         return;
+
     }
 
 
@@ -916,6 +1255,7 @@ function goToCopper() {
 
 
     showPage(5);
+
 }
 
 
@@ -927,7 +1267,11 @@ function renderCopperInputs() {
         );
 
 
-    if (!container) return;
+    if (!container) {
+
+        return;
+
+    }
 
 
     container.innerHTML =
@@ -940,8 +1284,13 @@ function renderCopperInputs() {
                     <div class="card">
 
                         <h3>
+
                             ${index + 1}.
-                            ${escapeHTML(room.name)}
+
+                            ${escapeHTML(
+                                room.name
+                            )}
+
                         </h3>
 
 
@@ -982,6 +1331,7 @@ function renderCopperInputs() {
             )
 
             .join("");
+
 }
 
 
@@ -991,10 +1341,12 @@ function renderCopperInputs() {
 
 function previewCopper() {
 
-    let valid = true;
+    let valid =
+        true;
 
 
     quotation.rooms.forEach(
+
         (room, index) => {
 
             const copperInput =
@@ -1028,9 +1380,12 @@ function previewCopper() {
                 drainage < 0
             ) {
 
-                valid = false;
+                valid =
+                    false;
+
 
                 return;
+
             }
 
 
@@ -1042,6 +1397,7 @@ function previewCopper() {
                 drainage;
 
         }
+
     );
 
 
@@ -1051,7 +1407,9 @@ function previewCopper() {
             "Please enter valid copper and drainage lengths for every room."
         );
 
+
         return;
+
     }
 
 
@@ -1059,11 +1417,13 @@ function previewCopper() {
 
 
     showPage(6);
+
 }
 
 
 /* =========================================================
    COPPER + DRAINAGE PREVIEW
+   Continues in Section 2
    ========================================================= */
 
 function renderCopperPreview() {
@@ -1072,26 +1432,39 @@ function renderCopperPreview() {
         document.getElementById(
             "copperPreview"
         );
+   
+    if (!container) {
 
+        return;
 
-    if (!container) return;
+    }
 
 
     const totalCopper =
         quotation.rooms.reduce(
+
             (sum, room) =>
                 sum +
-                Number(room.copper || 0),
+                Number(
+                    room.copper || 0
+                ),
+
             0
+
         );
 
 
     const totalDrainage =
         quotation.rooms.reduce(
+
             (sum, room) =>
                 sum +
-                Number(room.drainage || 0),
+                Number(
+                    room.drainage || 0
+                ),
+
             0
+
         );
 
 
@@ -1125,45 +1498,70 @@ function renderCopperPreview() {
                 <tbody>
 
                     ${
+
                         quotation.rooms
+
                             .map(room => `
 
                                 <tr>
 
                                     <td>
-                                        ${escapeHTML(room.name)}
+
+                                        ${escapeHTML(
+                                            room.name
+                                        )}
+
                                     </td>
 
                                     <td class="number">
-                                        ${number(room.copper)}
+
+                                        ${number(
+                                            room.copper
+                                        )}
+
                                         m
+
                                     </td>
 
                                     <td class="number">
-                                        ${number(room.drainage)}
+
+                                        ${number(
+                                            room.drainage
+                                        )}
+
                                         m
+
                                     </td>
 
                                 </tr>
 
                             `)
+
                             .join("")
+
                     }
 
 
                     <tr>
 
                         <td>
+
                             <strong>
                                 Total
                             </strong>
+
                         </td>
 
                         <td class="number">
 
                             <strong>
-                                ${number(totalCopper)}
+
+                                ${number(
+                                    totalCopper
+                                )}
+
                                 m
+
                             </strong>
 
                         </td>
@@ -1171,8 +1569,13 @@ function renderCopperPreview() {
                         <td class="number">
 
                             <strong>
-                                ${number(totalDrainage)}
+
+                                ${number(
+                                    totalDrainage
+                                )}
+
                                 m
+
                             </strong>
 
                         </td>
@@ -1186,6 +1589,7 @@ function renderCopperPreview() {
         </div>
 
     `;
+
 }
 
 
@@ -1199,12 +1603,14 @@ function renderCopperPreview() {
 function goToDrainage() {
 
     previewCopper();
+
 }
 
 
 function previewDrainage() {
 
     previewCopper();
+
 }
 
 
@@ -1224,9 +1630,12 @@ function goToCoolingLoad() {
             "Please add rooms before entering cooling load factors."
         );
 
+
         showPage(1);
 
+
         return;
+
     }
 
 
@@ -1234,6 +1643,7 @@ function goToCoolingLoad() {
 
 
     showPage(7);
+
 }
 
 
@@ -1249,7 +1659,11 @@ function renderCoolingLoadInputs() {
         );
 
 
-    if (!container) return;
+    if (!container) {
+
+        return;
+
+    }
 
 
     container.innerHTML =
@@ -1262,8 +1676,13 @@ function renderCoolingLoadInputs() {
                     <div class="card">
 
                         <h3>
+
                             ${index + 1}.
-                            ${escapeHTML(room.name)}
+
+                            ${escapeHTML(
+                                room.name
+                            )}
+
                         </h3>
 
 
@@ -1272,8 +1691,13 @@ function renderCoolingLoadInputs() {
                             Room Area:
 
                             <strong>
-                                ${number(room.area)}
+
+                                ${number(
+                                    room.area
+                                )}
+
                                 m²
+
                             </strong>
 
                         </p>
@@ -1304,16 +1728,26 @@ function renderCoolingLoadInputs() {
                             <strong
                                 id="load-${index}"
                             >
+
                                 ${
+
                                     number(
-                                        Number(room.area) *
+
+                                        Number(
+                                            room.area
+                                        ) *
+
                                         Number(
                                             room.coolingFactor ||
                                             700
                                         )
+
                                     )
+
                                 }
+
                                 BTU/hr
+
                             </strong>
 
                         </div>
@@ -1324,6 +1758,7 @@ function renderCoolingLoadInputs() {
             )
 
             .join("");
+
 }
 
 
@@ -1356,6 +1791,7 @@ function updateCoolingLoadPreview(index) {
     ) {
 
         return;
+
     }
 
 
@@ -1373,18 +1809,24 @@ function updateCoolingLoadPreview(index) {
         loadOutput.textContent =
             "0 BTU/hr";
 
+
         return;
+
     }
 
 
     const load =
-        Number(room.area) *
+        Number(
+            room.area
+        ) *
         factor;
 
 
     loadOutput.textContent =
         `${number(load)} BTU/hr`;
+
 }
+
 
 /* =========================================================
    SECTION 3 OF 7
@@ -1398,19 +1840,28 @@ function updateCoolingLoadPreview(index) {
 
 function selectCapacity(load) {
 
-    for (const capacity of AC_CAPACITIES) {
+    for (
+        const capacity
+        of AC_CAPACITIES
+    ) {
 
-        if (load <= capacity) {
+        if (
+            load <= capacity
+        ) {
 
             return capacity;
 
         }
+
     }
 
 
     return AC_CAPACITIES[
+
         AC_CAPACITIES.length - 1
+
     ];
+
 }
 
 
@@ -1430,18 +1881,25 @@ function recommendACUnits(load) {
 
     let remaining =
         Math.max(
+
             0,
-            Number(load) || 0
+
+            Number(load) ||
+            0
+
         );
 
 
     const maximumCapacity =
         AC_CAPACITIES[
+
             AC_CAPACITIES.length - 1
+
         ];
 
 
-    const units = [];
+    const units =
+        [];
 
 
     while (
@@ -1465,10 +1923,13 @@ function recommendACUnits(load) {
 
         remaining -=
             maximumCapacity;
+
     }
 
 
-    if (remaining > 0) {
+    if (
+        remaining > 0
+    ) {
 
         units.push({
 
@@ -1489,6 +1950,7 @@ function recommendACUnits(load) {
 
 
     return units;
+
 }
 
 
@@ -1507,16 +1969,21 @@ function previewCoolingLoad() {
             "No rooms found. Please add rooms first."
         );
 
+
         showPage(1);
 
+
         return;
+
     }
 
 
-    let valid = true;
+    let valid =
+        true;
 
 
     quotation.rooms.forEach(
+
         (room, index) => {
 
             const input =
@@ -1527,9 +1994,12 @@ function previewCoolingLoad() {
 
             if (!input) {
 
-                valid = false;
+                valid =
+                    false;
+
 
                 return;
+
             }
 
 
@@ -1544,9 +2014,12 @@ function previewCoolingLoad() {
                 factor <= 0
             ) {
 
-                valid = false;
+                valid =
+                    false;
+
 
                 return;
+
             }
 
 
@@ -1555,7 +2028,9 @@ function previewCoolingLoad() {
 
 
             room.coolingLoad =
-                Number(room.area) *
+                Number(
+                    room.area
+                ) *
                 factor;
 
 
@@ -1567,7 +2042,7 @@ function previewCoolingLoad() {
 
             /*
                Keep room.capacity for compatibility with
-               any older sections of the application.
+               older sections of the application.
 
                If the room has several AC units, capacity
                stores their total installed capacity.
@@ -1575,15 +2050,20 @@ function previewCoolingLoad() {
 
             room.capacity =
                 room.acUnits.reduce(
+
                     (sum, unit) =>
                         sum +
                         Number(
-                            unit.capacity || 0
+                            unit.capacity ||
+                            0
                         ),
+
                     0
+
                 );
 
         }
+
     );
 
 
@@ -1593,22 +2073,26 @@ function previewCoolingLoad() {
             "Please enter a valid cooling load factor for every room."
         );
 
+
         return;
+
     }
 
 
     /*
-       Any earlier prices are cleared because recalculating
-       recommendations may change the equipment combinations.
+       Earlier prices are cleared because recalculating
+       recommendations may change equipment combinations.
     */
 
-    quotation.acPrices = [];
+    quotation.acPrices =
+        [];
 
 
     renderCoolingLoadPreview();
 
 
     showPage(8);
+
 }
 
 
@@ -1624,7 +2108,11 @@ function renderCoolingLoadPreview() {
         );
 
 
-    if (!container) return;
+    if (!container) {
+
+        return;
+
+    }
 
 
     container.innerHTML =
@@ -1632,18 +2120,27 @@ function renderCoolingLoadPreview() {
         quotation.rooms
 
             .map(
+
                 (room, roomIndex) => {
 
                     const totalSelectedCapacity =
 
-                        (room.acUnits || [])
+                        (
+                            room.acUnits ||
+                            []
+                        )
+
                             .reduce(
+
                                 (sum, unit) =>
                                     sum +
                                     Number(
-                                        unit.capacity || 0
+                                        unit.capacity ||
+                                        0
                                     ),
+
                                 0
+
                             );
 
 
@@ -1654,7 +2151,10 @@ function renderCoolingLoadPreview() {
                             <h3>
 
                                 ${roomIndex + 1}.
-                                ${escapeHTML(room.name)}
+
+                                ${escapeHTML(
+                                    room.name
+                                )}
 
                             </h3>
 
@@ -1665,7 +2165,10 @@ function renderCoolingLoadPreview() {
 
                                 <strong>
 
-                                    ${number(room.area)}
+                                    ${number(
+                                        room.area
+                                    )}
+
                                     m²
 
                                 </strong>
@@ -1697,6 +2200,7 @@ function renderCoolingLoadPreview() {
                                     ${number(
                                         room.coolingLoad
                                     )}
+
                                     BTU/hr
 
                                 </strong>
@@ -1714,10 +2218,18 @@ function renderCoolingLoadPreview() {
 
 
                             ${
-                                (room.acUnits || [])
+
+                                (
+                                    room.acUnits ||
+                                    []
+                                )
 
                                     .map(
-                                        (unit, unitIndex) => `
+
+                                        (
+                                            unit,
+                                            unitIndex
+                                        ) => `
 
                                             <div
                                                 class="ac-recommendation-unit"
@@ -1748,6 +2260,7 @@ function renderCoolingLoadPreview() {
                                                     >
 
                                                         ${
+
                                                             AC_CAPACITIES
 
                                                                 .map(
@@ -1757,6 +2270,7 @@ function renderCoolingLoadPreview() {
                                                                             value="${capacity}"
 
                                                                             ${
+
                                                                                 Number(
                                                                                     unit.capacity
                                                                                 ) ===
@@ -1764,14 +2278,17 @@ function renderCoolingLoadPreview() {
 
                                                                                     ? "selected"
                                                                                     : ""
+
                                                                             }
                                                                         >
 
                                                                             ${
+
                                                                                 capacity
                                                                                     .toLocaleString(
                                                                                         "en-KE"
                                                                                     )
+
                                                                             }
 
                                                                             BTU/hr
@@ -1782,6 +2299,7 @@ function renderCoolingLoadPreview() {
                                                                 )
 
                                                                 .join("")
+
                                                         }
 
                                                     </select>
@@ -1805,11 +2323,17 @@ function renderCoolingLoadPreview() {
                                                     >
 
                                                         ${
+
                                                             [
+
                                                                 "HIGHWALL",
+
                                                                 "CASSETTE",
+
                                                                 "DUCTABLE AC",
+
                                                                 "PORTABLE AC"
+
                                                             ]
 
                                                                 .map(
@@ -1819,11 +2343,13 @@ function renderCoolingLoadPreview() {
                                                                             value="${type}"
 
                                                                             ${
+
                                                                                 unit.type ===
                                                                                 type
 
                                                                                     ? "selected"
                                                                                     : ""
+
                                                                             }
                                                                         >
 
@@ -1835,6 +2361,7 @@ function renderCoolingLoadPreview() {
                                                                 )
 
                                                                 .join("")
+
                                                         }
 
                                                     </select>
@@ -1858,10 +2385,15 @@ function renderCoolingLoadPreview() {
                                                     >
 
                                                         ${
+
                                                             [
+
                                                                 "VON",
+
                                                                 "LG",
+
                                                                 "DAIKIN"
+
                                                             ]
 
                                                                 .map(
@@ -1871,11 +2403,13 @@ function renderCoolingLoadPreview() {
                                                                             value="${brand}"
 
                                                                             ${
+
                                                                                 unit.brand ===
                                                                                 brand
 
                                                                                     ? "selected"
                                                                                     : ""
+
                                                                             }
                                                                         >
 
@@ -1887,6 +2421,7 @@ function renderCoolingLoadPreview() {
                                                                 )
 
                                                                 .join("")
+
                                                         }
 
                                                     </select>
@@ -1899,6 +2434,7 @@ function renderCoolingLoadPreview() {
                                     )
 
                                     .join("")
+
                             }
 
 
@@ -1909,10 +2445,12 @@ function renderCoolingLoadPreview() {
                                 <strong>
 
                                     ${
+
                                         totalSelectedCapacity
                                             .toLocaleString(
                                                 "en-KE"
                                             )
+
                                     }
 
                                     BTU/hr
@@ -1926,9 +2464,11 @@ function renderCoolingLoadPreview() {
                     `;
 
                 }
+
             )
 
             .join("");
+
 }
 
 
@@ -1967,10 +2507,14 @@ function updateRecommendedAC(
     ) {
 
         return;
+
     }
 
 
-    if (field === "capacity") {
+    if (
+        field ===
+        "capacity"
+    ) {
 
         const capacity =
             Number(value);
@@ -1983,6 +2527,7 @@ function updateRecommendedAC(
         ) {
 
             return;
+
         }
 
 
@@ -1999,12 +2544,16 @@ function updateRecommendedAC(
 
     room.capacity =
         room.acUnits.reduce(
+
             (sum, item) =>
                 sum +
                 Number(
-                    item.capacity || 0
+                    item.capacity ||
+                    0
                 ),
+
             0
+
         );
 
 
@@ -2014,7 +2563,8 @@ function updateRecommendedAC(
        selection changes.
     */
 
-    quotation.acPrices = [];
+    quotation.acPrices =
+        [];
 
 
     /*
@@ -2023,6 +2573,7 @@ function updateRecommendedAC(
     */
 
     renderCoolingLoadPreview();
+
 }
 
 
@@ -2041,13 +2592,16 @@ function goToACPrices() {
             "No rooms or AC recommendations found."
         );
 
+
         return;
+
     }
 
 
     const missingRecommendation =
 
         quotation.rooms.some(
+
             room =>
 
                 !Array.isArray(
@@ -2055,6 +2609,7 @@ function goToACPrices() {
                 ) ||
 
                 room.acUnits.length === 0
+
         );
 
 
@@ -2064,9 +2619,12 @@ function goToACPrices() {
             "AC recommendations have not been calculated."
         );
 
+
         showPage(7);
 
+
         return;
+
     }
 
 
@@ -2074,6 +2632,7 @@ function goToACPrices() {
 
 
     showPage(9);
+
 }
 
 
@@ -2085,7 +2644,7 @@ function goToACPrices() {
    2. AC type
    3. Brand
 
-   The rooms served by every combination are retained.
+   Rooms served by every combination are retained.
    ========================================================= */
 
 function getACCombinations() {
@@ -2095,15 +2654,21 @@ function getACCombinations() {
 
 
     quotation.rooms.forEach(
+
         room => {
 
-            (room.acUnits || [])
+            (
+                room.acUnits ||
+                []
+            )
+
                 .forEach(unit => {
 
                     const capacity =
                         Number(
                             unit.capacity
-                        ) || 0;
+                        ) ||
+                        0;
 
 
                     const type =
@@ -2121,11 +2686,15 @@ function getACCombinations() {
 
 
                     if (
-                        !combinations.has(key)
+                        !combinations.has(
+                            key
+                        )
                     ) {
 
                         combinations.set(
+
                             key,
+
                             {
 
                                 key,
@@ -2141,16 +2710,20 @@ function getACCombinations() {
                                 quantity: 0
 
                             }
+
                         );
 
                     }
 
 
                     const item =
-                        combinations.get(key);
+                        combinations.get(
+                            key
+                        );
 
 
-                    item.quantity += 1;
+                    item.quantity +=
+                        1;
 
 
                     if (
@@ -2168,6 +2741,7 @@ function getACCombinations() {
                 });
 
         }
+
     );
 
 
@@ -2176,6 +2750,7 @@ function getACCombinations() {
         ...combinations.values()
 
     ].sort(
+
         (a, b) =>
 
             b.capacity -
@@ -2188,7 +2763,9 @@ function getACCombinations() {
             a.brand.localeCompare(
                 b.brand
             )
+
     );
+
 }
 
 
@@ -2204,7 +2781,11 @@ function renderACPriceInputs() {
         );
 
 
-    if (!container) return;
+    if (!container) {
+
+        return;
+
+    }
 
 
     const combinations =
@@ -2216,7 +2797,7 @@ function renderACPriceInputs() {
     ) {
 
         container.innerHTML = `
-
+        
             <div class="empty-message">
 
                 No AC equipment combinations were found.
@@ -2226,6 +2807,7 @@ function renderACPriceInputs() {
         `;
 
         return;
+
     }
 
 
@@ -2238,9 +2820,11 @@ function renderACPriceInputs() {
                 const existing =
 
                     quotation.acPrices.find(
+
                         priceItem =>
                             priceItem.key ===
                             item.key
+
                     );
 
 
@@ -2250,7 +2834,9 @@ function renderACPriceInputs() {
 
                         <h3>
 
-                            ${escapeHTML(item.brand)}
+                            ${escapeHTML(
+                                item.brand
+                            )}
 
                             ${Number(
                                 item.capacity
@@ -2260,7 +2846,9 @@ function renderACPriceInputs() {
 
                             BTU/hr
 
-                            ${escapeHTML(item.type)}
+                            ${escapeHTML(
+                                item.type
+                            )}
 
                         </h3>
 
@@ -2272,11 +2860,15 @@ function renderACPriceInputs() {
                             <strong>
 
                                 ${
+
                                     item.rooms
+
                                         .map(
                                             escapeHTML
                                         )
+
                                         .join(", ")
+
                                 }
 
                             </strong>
@@ -2307,13 +2899,11 @@ function renderACPriceInputs() {
                                 step="0.01"
                                 class="ac-price-input"
                                 data-key="${escapeHTML(item.key)}"
-
                                 value="${
                                     existing
                                         ? existing.unitPrice
                                         : ""
                                 }"
-
                                 placeholder="Enter unit price"
                             >
 
@@ -2326,6 +2916,7 @@ function renderACPriceInputs() {
             })
 
             .join("");
+
 }
 
 
@@ -2341,10 +2932,12 @@ function saveACPrices() {
         );
 
 
-    let valid = true;
+    let valid =
+        true;
 
 
-    const prices = [];
+    const prices =
+        [];
 
 
     const combinations =
@@ -2368,25 +2961,34 @@ function saveACPrices() {
             unitPrice <= 0
         ) {
 
-            valid = false;
+            valid =
+                false;
+
 
             return;
+
         }
 
 
         const combination =
 
             combinations.find(
+
                 item =>
-                    item.key === key
+                    item.key ===
+                    key
+
             );
 
 
         if (!combination) {
 
-            valid = false;
+            valid =
+                false;
+
 
             return;
+
         }
 
 
@@ -2416,7 +3018,9 @@ function saveACPrices() {
             "Please enter a valid price for every AC combination."
         );
 
+
         return;
+
     }
 
 
@@ -2424,7 +3028,16 @@ function saveACPrices() {
         prices;
 
 
-    goToMaterialRates();
+    if (isSupplyOnly()) {
+
+        showPage(13);
+
+    } else {
+
+        goToMaterialRates();
+
+    }
+
 }
 
 
@@ -2547,6 +3160,7 @@ const INSTALLATION_RATES = {
 function getTotalACUnits() {
 
     return quotation.rooms.reduce(
+
         (sum, room) =>
 
             sum +
@@ -2559,8 +3173,11 @@ function getTotalACUnits() {
                     ? room.acUnits.length
                     : 0
             ),
+
         0
+
     );
+
 }
 
 
@@ -2587,6 +3204,7 @@ function getInstallationUnitCost() {
         ] || 0
 
     );
+
 }
 
 
@@ -2609,6 +3227,7 @@ function getInstallationTotal() {
         )
 
     );
+
 }
 
 
@@ -2630,7 +3249,11 @@ function renderInstallationCostPage() {
         );
 
 
-    if (!page) return;
+    if (!page) {
+
+        return;
+
+    }
 
 
     page.innerHTML = `
@@ -2663,6 +3286,7 @@ function renderInstallationCostPage() {
                     </option>
 
                     ${
+
                         Object.keys(
                             INSTALLATION_RATES
                         )
@@ -2673,11 +3297,13 @@ function renderInstallationCostPage() {
                                     value="${escapeHTML(region)}"
 
                                     ${
+
                                         quotation.installationRegion ===
                                         region
 
                                             ? "selected"
                                             : ""
+
                                     }
                                 >
 
@@ -2688,6 +3314,7 @@ function renderInstallationCostPage() {
                             `)
 
                             .join("")
+
                     }
 
                 </select>
@@ -2710,11 +3337,13 @@ function renderInstallationCostPage() {
                         value="HIGHWALL"
 
                         ${
+
                             quotation.acType ===
                             "HIGHWALL"
 
                                 ? "selected"
                                 : ""
+
                         }
                     >
                         HIGHWALL
@@ -2725,11 +3354,13 @@ function renderInstallationCostPage() {
                         value="CASSETTE"
 
                         ${
+
                             quotation.acType ===
                             "CASSETTE"
 
                                 ? "selected"
                                 : ""
+
                         }
                     >
                         CASSETTE
@@ -2740,11 +3371,13 @@ function renderInstallationCostPage() {
                         value="DUCTABLE"
 
                         ${
+
                             quotation.acType ===
                             "DUCTABLE"
 
                                 ? "selected"
                                 : ""
+
                         }
                     >
                         DUCTABLE
@@ -2755,11 +3388,13 @@ function renderInstallationCostPage() {
                         value="FLOOR STANDING"
 
                         ${
+
                             quotation.acType ===
                             "FLOOR STANDING"
 
                                 ? "selected"
                                 : ""
+
                         }
                     >
                         FLOOR STANDING
@@ -2946,22 +3581,30 @@ function renderInstallationCostPage() {
                 money(total);
 
         }
+
     }
 
 
     regionSelect?.addEventListener(
+
         "change",
+
         updateInstallationPreview
+
     );
 
 
     typeSelect?.addEventListener(
+
         "change",
+
         updateInstallationPreview
+
     );
 
 
     updateInstallationPreview();
+
 }
 
 
@@ -2979,6 +3622,7 @@ function goToInstallationCosts() {
 
 
     showPage(11);
+
 }
 
 
@@ -2991,13 +3635,15 @@ function saveInstallationCosts() {
     const region =
         document.getElementById(
             "installationRegion"
-        )?.value || "";
+        )?.value ||
+        "";
 
 
     const type =
         document.getElementById(
             "acType"
-        )?.value || "";
+        )?.value ||
+        "";
 
 
     if (!region) {
@@ -3006,7 +3652,9 @@ function saveInstallationCosts() {
             "Please select the installation region."
         );
 
+
         return;
+
     }
 
 
@@ -3016,7 +3664,9 @@ function saveInstallationCosts() {
             "Please select the installation AC type."
         );
 
+
         return;
+
     }
 
 
@@ -3042,7 +3692,9 @@ function saveInstallationCosts() {
             "Unable to calculate the installation cost. Please check the AC quantities and selections."
         );
 
+
         return;
+
     }
 
 
@@ -3071,6 +3723,7 @@ function saveInstallationCosts() {
 
 
     showPage(12);
+
 }
 
 
@@ -3079,6 +3732,9 @@ function saveInstallationCosts() {
    ========================================================= */
 
 function goToMaterialRates() {
+
+    ensureFlexibleCableRateFields();
+
 
     const copperInput =
         document.getElementById(
@@ -3092,10 +3748,41 @@ function goToMaterialRates() {
         );
 
 
+    const flexibleCableTypeInput =
+        document.getElementById(
+            "flexibleCableType"
+        );
+
+
+    const flexibleCableRateInput =
+        document.getElementById(
+            "flexibleCableRate"
+        );
+
+
     if (copperInput) {
 
         copperInput.value =
-            quotation.copperRate || "";
+            quotation.copperRate ||
+            "";
+
+    }
+
+
+    if (flexibleCableTypeInput) {
+
+        flexibleCableTypeInput.value =
+            quotation.flexibleCableType ||
+            "1.5mm 3 core flexible cable";
+
+    }
+
+
+    if (flexibleCableRateInput) {
+
+        flexibleCableRateInput.value =
+            quotation.flexibleCableRate ||
+            "";
 
     }
 
@@ -3103,12 +3790,143 @@ function goToMaterialRates() {
     if (drainageInput) {
 
         drainageInput.value =
-            quotation.drainageRate || "";
+            quotation.drainageRate ||
+            "";
 
     }
 
 
     showPage(10);
+
+}
+
+
+/* =========================================================
+   CREATE FLEXIBLE CABLE FIELDS
+   ========================================================= */
+
+function ensureFlexibleCableRateFields() {
+
+    if (
+        document.getElementById(
+            "flexibleCableType"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const drainageInput =
+        document.getElementById(
+            "drainageRate"
+        );
+
+
+    if (!drainageInput) {
+
+        return;
+
+    }
+
+
+    const drainageField =
+
+        drainageInput.closest(
+
+            ".form-group, .input-group, .field, label"
+
+        ) ||
+
+        drainageInput.parentElement;
+
+
+    if (
+        !drainageField ||
+        !drainageField.parentNode
+    ) {
+
+        return;
+
+    }
+
+
+    const wrapper =
+        document.createElement(
+            "div"
+        );
+
+
+    wrapper.className =
+        drainageField.className ||
+        "form-group";
+
+
+    wrapper.innerHTML = `
+
+        <label for="flexibleCableType">
+            Flexible Cable Type
+        </label>
+
+        <select id="flexibleCableType">
+
+            <option value="1.5mm 3 core flexible cable">
+                1.5mm 3 core flexible cable
+            </option>
+
+            <option value="2.5mm 3 core flexible cable">
+                2.5mm 3 core flexible cable
+            </option>
+
+            <option value="1.5mm 4 core flexible cable">
+                1.5mm 4 core flexible cable
+            </option>
+
+            <option value="2.5mm 4 core flexible cable">
+                2.5mm 4 core flexible cable
+            </option>
+
+        </select>
+
+
+        <label for="flexibleCableRate">
+            Flexible Cable Rate per Metre (KES)
+        </label>
+
+        <input
+            id="flexibleCableRate"
+            type="number"
+            min="0"
+            step="0.01"
+            inputmode="decimal"
+            placeholder="Enter rate per metre"
+        >
+
+        <small>
+            Total cable length equals total copper length.
+        </small>
+
+    `;
+
+
+    /*
+       Insert flexible cable immediately before drainage.
+       This gives the required display order:
+
+       1. Copper rate
+       2. Flexible cable type and rate
+       3. Drainage rate
+    */
+
+    drainageField.parentNode.insertBefore(
+
+        wrapper,
+
+        drainageField
+
+    );
+
 }
 
 
@@ -3120,17 +3938,40 @@ function saveMaterialRates() {
 
     const copperRate =
         Number(
+
             document.getElementById(
                 "copperRate"
             )?.value
+
+        );
+
+
+    const flexibleCableType =
+
+        document.getElementById(
+            "flexibleCableType"
+        )?.value ||
+
+        "1.5mm 3 core flexible cable";
+
+
+    const flexibleCableRate =
+        Number(
+
+            document.getElementById(
+                "flexibleCableRate"
+            )?.value
+
         );
 
 
     const drainageRate =
         Number(
+
             document.getElementById(
                 "drainageRate"
             )?.value
+
         );
 
 
@@ -3143,7 +3984,26 @@ function saveMaterialRates() {
             "Please enter a valid copper rate."
         );
 
+
         return;
+
+    }
+
+
+    if (
+        !Number.isFinite(
+            flexibleCableRate
+        ) ||
+        flexibleCableRate < 0
+    ) {
+
+        alert(
+            "Please enter a valid flexible cable rate."
+        );
+
+
+        return;
+
     }
 
 
@@ -3156,7 +4016,9 @@ function saveMaterialRates() {
             "Please enter a valid drainage rate."
         );
 
+
         return;
+
     }
 
 
@@ -3164,12 +4026,22 @@ function saveMaterialRates() {
         copperRate;
 
 
+    quotation.flexibleCableType =
+        flexibleCableType;
+
+
+    quotation.flexibleCableRate =
+        flexibleCableRate;
+
+
     quotation.drainageRate =
         drainageRate;
 
 
     goToInstallationCosts();
+
 }
+
 
 /* =========================================================
    SECTION 4 OF 7
@@ -3191,7 +4063,11 @@ function renderAdditionalItems() {
         );
 
 
-    if (!container) return;
+    if (!container) {
+
+        return;
+
+    }
 
 
     container.innerHTML = `
@@ -3214,10 +4090,14 @@ function renderAdditionalItems() {
                 <strong>
 
                     ${
+
                         escapeHTML(
+
                             quotation.installationRegion ||
                             "Not selected"
+
                         )
+
                     }
 
                 </strong>
@@ -3232,10 +4112,14 @@ function renderAdditionalItems() {
                 <strong>
 
                     ${
+
                         escapeHTML(
+
                             quotation.acType ||
                             "Not selected"
+
                         )
+
                     }
 
                 </strong>
@@ -3250,9 +4134,12 @@ function renderAdditionalItems() {
                 <strong>
 
                     ${
+
                         Number(
                             quotation.installationUnitCount
-                        ) || 0
+                        ) ||
+                        0
+
                     }
 
                 </strong>
@@ -3267,9 +4154,11 @@ function renderAdditionalItems() {
                 <strong>
 
                     ${
+
                         money(
                             quotation.installationUnitCost
                         )
+
                     }
 
                 </strong>
@@ -3284,9 +4173,11 @@ function renderAdditionalItems() {
                 <strong>
 
                     ${
+
                         money(
                             getInstallationCommissioningTotal()
                         )
+
                     }
 
                 </strong>
@@ -3308,7 +4199,7 @@ function renderAdditionalItems() {
 
 
             <label>
-
+            
                 Item Name
 
                 <input
@@ -3542,8 +4433,11 @@ function renderAdditionalItems() {
             "extraItemQty"
         )
         ?.addEventListener(
+
             "input",
+
             calculateExtraItem
+
         );
 
 
@@ -3552,8 +4446,11 @@ function renderAdditionalItems() {
             "extraItemPrice"
         )
         ?.addEventListener(
+
             "input",
+
             calculateExtraItem
+
         );
 
 
@@ -3566,7 +4463,9 @@ function renderAdditionalItems() {
             "includePreliminaries"
         )
         ?.addEventListener(
+
             "change",
+
             function () {
 
                 quotation.includePreliminaries =
@@ -3582,6 +4481,7 @@ function renderAdditionalItems() {
                 if (container) {
 
                     container.style.display =
+
                         this.checked
                             ? "block"
                             : "none";
@@ -3589,6 +4489,7 @@ function renderAdditionalItems() {
                 }
 
             }
+
         );
 
 
@@ -3597,7 +4498,9 @@ function renderAdditionalItems() {
             "preliminariesCost"
         )
         ?.addEventListener(
+
             "input",
+
             function () {
 
                 quotation.preliminariesCost =
@@ -3606,6 +4509,7 @@ function renderAdditionalItems() {
                     ) || 0;
 
             }
+
         );
 
 
@@ -3618,7 +4522,9 @@ function renderAdditionalItems() {
             "includeAsBuiltDrawing"
         )
         ?.addEventListener(
+
             "change",
+
             function () {
 
                 quotation.includeAsBuiltDrawing =
@@ -3634,6 +4540,7 @@ function renderAdditionalItems() {
                 if (container) {
 
                     container.style.display =
+
                         this.checked
                             ? "block"
                             : "none";
@@ -3641,6 +4548,7 @@ function renderAdditionalItems() {
                 }
 
             }
+
         );
 
 
@@ -3649,7 +4557,9 @@ function renderAdditionalItems() {
             "asBuiltDrawingCost"
         )
         ?.addEventListener(
+
             "input",
+
             function () {
 
                 quotation.asBuiltDrawingCost =
@@ -3658,10 +4568,12 @@ function renderAdditionalItems() {
                     ) || 0;
 
             }
+
         );
 
 
     renderAdditionalItemsPreview();
+
 }
 
 
@@ -3673,17 +4585,21 @@ function calculateExtraItem() {
 
     const quantity =
         Number(
+
             document.getElementById(
                 "extraItemQty"
             )?.value
+
         );
 
 
     const unitPrice =
         Number(
+
             document.getElementById(
                 "extraItemPrice"
             )?.value
+
         );
 
 
@@ -3704,6 +4620,7 @@ function calculateExtraItem() {
             money(total);
 
     }
+
 }
 
 
@@ -3721,9 +4638,11 @@ function saveExtraItem() {
 
     const quantity =
         Number(
+
             document.getElementById(
                 "extraItemQty"
             )?.value
+
         );
 
 
@@ -3736,9 +4655,11 @@ function saveExtraItem() {
 
     const unitPrice =
         Number(
+
             document.getElementById(
                 "extraItemPrice"
             )?.value
+
         );
 
 
@@ -3754,7 +4675,9 @@ function saveExtraItem() {
             "Please enter the item name, quantity and a valid unit price."
         );
 
+
         return;
+
     }
 
 
@@ -3807,28 +4730,32 @@ function saveExtraItem() {
 
     if (nameInput) {
 
-        nameInput.value = "";
+        nameInput.value =
+            "";
 
     }
 
 
     if (quantityInput) {
 
-        quantityInput.value = "";
+        quantityInput.value =
+            "";
 
     }
 
 
     if (unitInput) {
 
-        unitInput.value = "";
+        unitInput.value =
+            "";
 
     }
 
 
     if (priceInput) {
 
-        priceInput.value = "";
+        priceInput.value =
+            "";
 
     }
 
@@ -3842,6 +4769,7 @@ function saveExtraItem() {
 
 
     renderAdditionalItemsPreview();
+
 }
 
 
@@ -3857,7 +4785,11 @@ function renderAdditionalItemsPreview() {
         );
 
 
-    if (!container) return;
+    if (!container) {
+
+        return;
+
+    }
 
 
     const additionalCards =
@@ -3884,20 +4816,29 @@ function renderAdditionalItemsPreview() {
                             <strong>
 
                                 ${index + 1}.
-                                ${escapeHTML(item.name)}
+
+                                ${escapeHTML(
+                                    item.name
+                                )}
 
                             </strong>
 
 
                             <p>
 
-                                ${number(item.quantity)}
+                                ${number(
+                                    item.quantity
+                                )}
 
-                                ${escapeHTML(item.unit)}
+                                ${escapeHTML(
+                                    item.unit
+                                )}
 
                                 ×
 
-                                ${money(item.unitPrice)}
+                                ${money(
+                                    item.unitPrice
+                                )}
 
                             </p>
 
@@ -3908,7 +4849,9 @@ function renderAdditionalItemsPreview() {
 
                                 <strong>
 
-                                    ${money(item.total)}
+                                    ${money(
+                                        item.total
+                                    )}
 
                                 </strong>
 
@@ -3933,6 +4876,7 @@ function renderAdditionalItemsPreview() {
 
     container.innerHTML =
         additionalCards;
+
 }
 
 
@@ -3947,6 +4891,7 @@ function deleteAdditionalItem(index) {
     ) {
 
         return;
+
     }
 
 
@@ -3957,16 +4902,21 @@ function deleteAdditionalItem(index) {
     ) {
 
         return;
+
     }
 
 
     quotation.additionalItems.splice(
+
         index,
+
         1
+
     );
 
 
     renderAdditionalItemsPreview();
+
 }
 
 
@@ -4033,7 +4983,9 @@ function finishAdditionalItems() {
             "Please enter a valid preliminaries cost."
         );
 
+
         return;
+
     }
 
 
@@ -4046,7 +4998,9 @@ function finishAdditionalItems() {
             "Please enter a valid as-built drawing cost."
         );
 
+
         return;
+
     }
 
 
@@ -4056,7 +5010,9 @@ function finishAdditionalItems() {
     */
 
     showPage(13);
+
 }
+
 
 /* =========================================================
    SECTION 5 OF 7
@@ -4075,13 +5031,16 @@ function getEquipmentTotal() {
         (sum, item) =>
 
             sum +
+
             Number(
-                item.total || 0
+                item.total ||
+                0
             ),
 
         0
 
     );
+
 }
 
 
@@ -4091,15 +5050,54 @@ function getEquipmentTotal() {
 
 function getCopperTotal() {
 
+    if (isSupplyOnly()) {
+
+        return 0;
+
+    }
+
+
     return (
 
         getTotalCopperLength() *
 
         Number(
-            quotation.copperRate || 0
+            quotation.copperRate ||
+            0
         )
 
     );
+
+}
+
+
+/* =========================================================
+   FLEXIBLE CABLE TOTAL
+
+   Flexible cable length is always equal to the total
+   measured copper length.
+   ========================================================= */
+
+function getFlexibleCableTotal() {
+
+    if (isSupplyOnly()) {
+
+        return 0;
+
+    }
+
+
+    return (
+
+        getTotalCopperLength() *
+
+        Number(
+            quotation.flexibleCableRate ||
+            0
+        )
+
+    );
+
 }
 
 
@@ -4109,15 +5107,24 @@ function getCopperTotal() {
 
 function getDrainageTotal() {
 
+    if (isSupplyOnly()) {
+
+        return 0;
+
+    }
+
+
     return (
 
         getTotalDrainageLength() *
 
         Number(
-            quotation.drainageRate || 0
+            quotation.drainageRate ||
+            0
         )
 
     );
+
 }
 
 
@@ -4127,9 +5134,18 @@ function getDrainageTotal() {
 
 function getInstallationCommissioningTotal() {
 
+    if (isSupplyOnly()) {
+
+        return 0;
+
+    }
+
+
     return Number(
-        quotation.installationTotal || 0
+        quotation.installationTotal ||
+        0
     );
+
 }
 
 
@@ -4139,18 +5155,28 @@ function getInstallationCommissioningTotal() {
 
 function getAdditionalItemsTotal() {
 
+    if (isSupplyOnly()) {
+
+        return 0;
+
+    }
+
+
     return quotation.additionalItems.reduce(
 
         (sum, item) =>
 
             sum +
+
             Number(
-                item.total || 0
+                item.total ||
+                0
             ),
 
         0
 
     );
+
 }
 
 
@@ -4159,6 +5185,13 @@ function getAdditionalItemsTotal() {
    ========================================================= */
 
 function getPreliminariesTotal() {
+
+    if (isSupplyOnly()) {
+
+        return 0;
+
+    }
+
 
     if (
         !quotation.includePreliminaries
@@ -4170,8 +5203,10 @@ function getPreliminariesTotal() {
 
 
     return Number(
-        quotation.preliminariesCost || 0
+        quotation.preliminariesCost ||
+        0
     );
+
 }
 
 
@@ -4180,6 +5215,13 @@ function getPreliminariesTotal() {
    ========================================================= */
 
 function getAsBuiltDrawingTotal() {
+
+    if (isSupplyOnly()) {
+
+        return 0;
+
+    }
+
 
     if (
         !quotation.includeAsBuiltDrawing
@@ -4191,8 +5233,10 @@ function getAsBuiltDrawingTotal() {
 
 
     return Number(
-        quotation.asBuiltDrawingCost || 0
+        quotation.asBuiltDrawingCost ||
+        0
     );
+
 }
 
 
@@ -4208,6 +5252,8 @@ function getHVACTotal() {
 
         getCopperTotal() +
 
+        getFlexibleCableTotal() +
+
         getDrainageTotal() +
 
         getInstallationCommissioningTotal() +
@@ -4215,6 +5261,7 @@ function getHVACTotal() {
         getAdditionalItemsTotal()
 
     );
+
 }
 
 
@@ -4233,6 +5280,7 @@ function getQuotationSubtotal() {
         getAsBuiltDrawingTotal()
 
     );
+
 }
 
 
@@ -4248,6 +5296,7 @@ function getQuotationVAT() {
         0.16
 
     );
+
 }
 
 
@@ -4264,6 +5313,7 @@ function getQuotationGrandTotal() {
         getQuotationVAT()
 
     );
+
 }
 
 
@@ -4276,31 +5326,37 @@ function getClientDetails() {
     quotation.clientName =
         document.getElementById(
             "clientName"
-        )?.value.trim() || "";
+        )?.value.trim() ||
+        "";
 
 
     quotation.installationLocation =
         document.getElementById(
             "installationLocation"
-        )?.value.trim() || "";
+        )?.value.trim() ||
+        "";
 
 
     quotation.salesPerson =
         document.getElementById(
             "salesPerson"
-        )?.value.trim() || "";
+        )?.value.trim() ||
+        "";
 
 
     quotation.salesPhone =
         document.getElementById(
             "salesPhone"
-        )?.value.trim() || "";
+        )?.value.trim() ||
+        "";
 
 
     quotation.salesEmail =
         document.getElementById(
             "salesEmail"
-        )?.value.trim() || "";
+        )?.value.trim() ||
+        "";
+
 }
 
 
@@ -4319,7 +5375,9 @@ function proceedToQuotationPreview() {
             "Please enter the client name."
         );
 
+
         return;
+
     }
 
 
@@ -4329,7 +5387,9 @@ function proceedToQuotationPreview() {
             "Please enter the installation location."
         );
 
+
         return;
+
     }
 
 
@@ -4337,6 +5397,7 @@ function proceedToQuotationPreview() {
 
 
     showPage(14);
+
 }
 
 
@@ -4352,7 +5413,11 @@ function renderQuotationPreview() {
         );
 
 
-    if (!container) return;
+    if (!container) {
+
+        return;
+
+    }
 
 
     const equipment =
@@ -4361,6 +5426,10 @@ function renderQuotationPreview() {
 
     const copper =
         getCopperTotal();
+
+
+    const flexibleCable =
+        getFlexibleCableTotal();
 
 
     const drainage =
@@ -4426,6 +5495,7 @@ function renderQuotationPreview() {
 
                             <td>
                                 CLIENT
+                                
                             </td>
 
                             <td>
@@ -4783,13 +5853,105 @@ function renderQuotationPreview() {
 
 
             <!-- =============================================
+                 FLEXIBLE CABLE
+            ============================================== -->
+
+            <div class="quotation-section">
+
+                <h3>
+                    3. FLEXIBLE CABLE
+                </h3>
+
+                <div style="overflow-x:auto">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Item
+                                </th>
+
+                                <th class="number">
+                                    Quantity
+                                </th>
+
+                                <th class="number">
+                                    Unit Price
+                                </th>
+
+                                <th class="number">
+                                    Total
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            <tr>
+
+                                <td>
+
+                                    ${
+                                        escapeHTML(
+                                            quotation.flexibleCableType ||
+                                            "1.5mm 3 core flexible cable"
+                                        )
+                                    }
+
+                                </td>
+
+                                <td class="number">
+
+                                    ${
+                                        number(
+                                            getTotalCopperLength()
+                                        )
+                                    }
+
+                                    m
+
+                                </td>
+
+                                <td class="number">
+
+                                    ${
+                                        money(
+                                            quotation.flexibleCableRate
+                                        )
+                                    }
+
+                                </td>
+
+                                <td class="number">
+
+                                    ${money(flexibleCable)}
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
                  DRAINAGE AND ACCESSORIES
             ============================================== -->
 
             <div class="quotation-section">
 
                 <h3>
-                    3. DRAINAGE AND ACCESSORIES
+                    4. DRAINAGE AND ACCESSORIES
                 </h3>
 
 
@@ -4876,7 +6038,7 @@ function renderQuotationPreview() {
             <div class="quotation-section">
 
                 <h3>
-                    4. INSTALLATION COMMISSIONING & ACCESSORIES
+                    5. INSTALLATION COMMISSIONING & ACCESSORIES
                 </h3>
 
 
@@ -5306,6 +6468,43 @@ function renderQuotationPreview() {
         </div>
 
     `;
+
+
+    /*
+       Supply-only quotations display equipment without
+       installation materials or commissioning sections.
+    */
+
+    if (isSupplyOnly()) {
+
+        container
+            .querySelectorAll(
+                ".quotation-section"
+            )
+            .forEach(section => {
+
+                const heading =
+                    section
+                        .querySelector("h3")
+                        ?.textContent
+                        .trim() ||
+                    "";
+
+
+                if (
+                    /^[2345]\./.test(
+                        heading
+                    )
+                ) {
+
+                    section.remove();
+
+                }
+
+            });
+
+    }
+
 }
 
 
@@ -5319,7 +6518,9 @@ function backToClientDetails() {
 
 
     showPage(13);
+
 }
+
 
 /* =========================================================
    SECTION 6 OF 7
@@ -5334,6 +6535,7 @@ function backToClientDetails() {
 function imageToDataURL(url) {
 
     return new Promise(
+
         (resolve, reject) => {
 
             const image =
@@ -5368,27 +6570,40 @@ function imageToDataURL(url) {
                         if (!context) {
 
                             reject(
+
                                 new Error(
                                     "Canvas is not supported."
                                 )
+
                             );
 
+
                             return;
+
                         }
 
 
                         context.drawImage(
+
                             image,
+
                             0,
+
                             0
+
                         );
 
 
                         resolve(
+
                             canvas.toDataURL(
+
                                 "image/jpeg",
+
                                 0.95
+
                             )
+
                         );
 
                     } catch (error) {
@@ -5404,10 +6619,14 @@ function imageToDataURL(url) {
                 function () {
 
                     reject(
+
                         new Error(
+
                             "Unable to load " +
                             url
+
                         )
+
                     );
 
                 };
@@ -5417,7 +6636,9 @@ function imageToDataURL(url) {
                 url;
 
         }
+
     );
+
 }
 
 
@@ -5444,22 +6665,33 @@ function addHeaderImage(
     try {
 
         doc.addImage(
+
             headerData,
+
             "JPEG",
+
             0,
+
             0,
+
             pageWidth,
+
             42
+
         );
 
     } catch (error) {
 
         console.warn(
+
             "Header image could not be added.",
+
             error
+
         );
 
     }
+
 }
 
 
@@ -5486,12 +6718,19 @@ function addFooterToPage(
         if (footerData) {
 
             doc.addImage(
+
                 footerData,
+
                 "JPEG",
+
                 0,
+
                 pageHeight - 35,
+
                 pageWidth,
+
                 35
+
             );
 
         }
@@ -5499,8 +6738,11 @@ function addFooterToPage(
     } catch (error) {
 
         console.warn(
+
             "Footer image could not be added.",
+
             error
+
         );
 
     }
@@ -5517,10 +6759,15 @@ function addFooterToPage(
 
 
     doc.text(
+
         `Page ${pageNumber}`,
+
         pageWidth - 25,
+
         pageHeight - 5
+
     );
+
 }
 
 
@@ -5539,23 +6786,29 @@ async function generateQuotation() {
             "Please enter the client name."
         );
 
+
         showPage(13);
 
+
         return;
+
     }
 
 
     if (
         !quotation.installationLocation
-    ) {
+           ) {
 
         alert(
             "Please enter the installation location."
         );
 
+
         showPage(13);
 
+
         return;
+
     }
 
 
@@ -5565,13 +6818,18 @@ async function generateQuotation() {
             "The PDF library could not be loaded. Please check your internet connection and reload the page."
         );
 
+
         return;
+
     }
 
 
-    let headerData = null;
+    let headerData =
+        null;
 
-    let footerData = null;
+
+    let footerData =
+        null;
 
 
     /*
@@ -5586,13 +6844,13 @@ async function generateQuotation() {
 
         headerData =
             await imageToDataURL(
-                "header.jpeg"
+                "header.jpg"
             );
 
     } catch (error) {
 
         console.warn(
-            "header.jpeg could not be loaded.",
+            "header image could not be loaded.",
             error
         );
 
@@ -5636,6 +6894,7 @@ async function generateQuotation() {
         );
 
     }
+
 }
 
 
@@ -5666,6 +6925,10 @@ function createPDFSummaryAndFinish(
 
     const copperTotal =
         getCopperTotal();
+
+
+    const flexibleCableTotal =
+        getFlexibleCableTotal();
 
 
     const drainageTotal =
@@ -5717,6 +6980,7 @@ function createPDFSummaryAndFinish(
 
         y =
             headerHeight + 8;
+
     }
 
 
@@ -5770,10 +7034,13 @@ function createPDFSummaryAndFinish(
        SUMMARY ROWS
        ===================================================== */
 
-    const summaryRows = [];
+    const summaryRows =
+        [];
 
 
-    if (equipmentTotal > 0) {
+    if (
+        equipmentTotal > 0
+    ) {
 
         summaryRows.push([
 
@@ -5794,7 +7061,9 @@ function createPDFSummaryAndFinish(
     }
 
 
-    if (copperTotal > 0) {
+    if (
+        copperTotal > 0
+    ) {
 
         summaryRows.push([
 
@@ -5819,7 +7088,37 @@ function createPDFSummaryAndFinish(
     }
 
 
-    if (drainageTotal > 0) {
+    if (
+        flexibleCableTotal > 0
+    ) {
+
+        summaryRows.push([
+
+            quotation.flexibleCableType ||
+            "1.5mm 3 core flexible cable",
+
+            `${
+                number(
+                    getTotalCopperLength()
+                )
+            } m`,
+
+            money(
+                quotation.flexibleCableRate
+            ),
+
+            money(
+                flexibleCableTotal
+            )
+
+        ]);
+
+    }
+
+
+    if (
+        drainageTotal > 0
+    ) {
 
         summaryRows.push([
 
@@ -5844,7 +7143,9 @@ function createPDFSummaryAndFinish(
     }
 
 
-    if (installationTotal > 0) {
+    if (
+        installationTotal > 0
+    ) {
 
         summaryRows.push([
 
@@ -5869,7 +7170,9 @@ function createPDFSummaryAndFinish(
     }
 
 
-    if (additionalItemsTotal > 0) {
+    if (
+        additionalItemsTotal > 0
+    ) {
 
         summaryRows.push([
 
@@ -5890,7 +7193,9 @@ function createPDFSummaryAndFinish(
     }
 
 
-    if (preliminariesTotal > 0) {
+    if (
+        preliminariesTotal > 0
+    ) {
 
         summaryRows.push([
 
@@ -5911,7 +7216,9 @@ function createPDFSummaryAndFinish(
     }
 
 
-    if (asBuiltDrawingTotal > 0) {
+    if (
+        asBuiltDrawingTotal > 0
+    ) {
 
         summaryRows.push([
 
@@ -6117,13 +7424,18 @@ function createPDFSummaryAndFinish(
 
 
     doc.text(
+
         money(subtotal),
+
         pageWidth - margin,
+
         y,
+
         {
             align:
                 "right"
         }
+
     );
 
 
@@ -6142,13 +7454,18 @@ function createPDFSummaryAndFinish(
 
 
     doc.text(
+
         money(vat),
+
         pageWidth - margin,
+
         y,
+
         {
             align:
                 "right"
         }
+
     );
 
 
@@ -6167,13 +7484,22 @@ function createPDFSummaryAndFinish(
 
 
     doc.roundedRect(
+
         margin,
+
         y - 5,
-        pageWidth - margin * 2,
+
+        pageWidth -
+        margin * 2,
+
         17,
+
         2,
+
         2,
+
         "F"
+
     );
 
 
@@ -6194,20 +7520,31 @@ function createPDFSummaryAndFinish(
 
 
     doc.text(
+
         "TOTAL COST INCLUSIVE OF 16% VAT",
+
         margin + 4,
+
         y + 5
+
     );
 
 
     doc.text(
+
         money(grandTotal),
-        pageWidth - margin - 4,
+
+        pageWidth -
+        margin -
+        4,
+
         y + 5,
+
         {
             align:
                 "right"
         }
+
     );
 
 
@@ -6538,7 +7875,9 @@ function createPDFSummaryAndFinish(
        ===================================================== */
 
     showPage(15);
+
 }
+
 
 /* =========================================================
    SECTION 7 OF 7
@@ -6560,13 +7899,16 @@ function getTotalCopperLength() {
         (sum, room) =>
 
             sum +
+
             Number(
-                room.copper || 0
+                room.copper ||
+                0
             ),
 
         0
 
     );
+
 }
 
 
@@ -6581,13 +7923,16 @@ function getTotalDrainageLength() {
         (sum, room) =>
 
             sum +
+
             Number(
-                room.drainage || 0
+                room.drainage ||
+                0
             ),
 
         0
 
     );
+
 }
 
 
@@ -6642,7 +7987,8 @@ function createPDF(
 
 
     let y =
-        headerHeight + 5;
+        headerHeight +
+        5;
 
 
     /* =====================================================
@@ -6666,13 +8012,18 @@ function createPDF(
 
 
     doc.text(
+
         "QUOTATION",
+
         pageWidth / 2,
+
         y,
+
         {
             align:
                 "center"
         }
+
     );
 
 
@@ -6681,7 +8032,7 @@ function createPDF(
 
     /* =====================================================
        CLIENT DETAILS
-       ===================================================== */
+          ===================================================== */
 
     doc.setFontSize(9);
 
@@ -6723,41 +8074,44 @@ function createPDF(
     ];
 
 
-    clientRows.forEach(
-        row => {
+    clientRows.forEach(row => {
 
-            doc.setFont(
-                "helvetica",
-                "bold"
-            );
-
-
-            doc.text(
-                row[0],
-                margin,
-                y
-            );
+        doc.setFont(
+            "helvetica",
+            "bold"
+        );
 
 
-            doc.setFont(
-                "helvetica",
-                "normal"
-            );
+        doc.text(
+            row[0],
+            margin,
+            y
+        );
 
 
-            doc.text(
-                String(
-                    row[1] || ""
-                ),
-                margin + 32,
-                y
-            );
+        doc.setFont(
+            "helvetica",
+            "normal"
+        );
 
 
-            y += 5;
+        doc.text(
 
-        }
-    );
+            String(
+                row[1] ||
+                ""
+            ),
+
+            margin + 32,
+
+            y
+
+        );
+
+
+        y += 5;
+
+    });
 
 
     y += 5;
@@ -6789,6 +8143,7 @@ function createPDF(
     const equipmentRows =
 
         quotation.acPrices.map(
+
             item => [
 
                 `${
@@ -6825,6 +8180,7 @@ function createPDF(
                 )
 
             ]
+
         );
 
 
@@ -6973,6 +8329,41 @@ function createPDF(
         8;
 
 
+    /*
+       Supply-only quotations end after equipment and
+       proceed directly to the summary.
+    */
+
+    if (isSupplyOnly()) {
+
+        createPDFSummaryAndFinish(
+
+            doc,
+
+            headerData,
+
+            footerData,
+
+            pageWidth,
+
+            pageHeight,
+
+            margin,
+
+            headerHeight,
+
+            footerHeight,
+
+            y
+
+        );
+
+
+        return;
+
+    }
+
+
     /* =====================================================
        CHECK SPACE FOR COPPER TABLE
        ===================================================== */
@@ -7000,7 +8391,7 @@ function createPDF(
 
 
     /* =====================================================
-       COPPER AND ACCESSORIES
+       COPPER AND FLEXIBLE CABLE
        ===================================================== */
 
     doc.setFont(
@@ -7020,7 +8411,7 @@ function createPDF(
 
 
     doc.text(
-        "2. COPPER AND ACCESSORIES",
+        "2. COPPER AND FLEXIBLE CABLE",
         margin,
         y
     );
@@ -7048,25 +8439,55 @@ function createPDF(
         ]],
 
 
-        body: [[
+        /*
+           The flexible-cable row appears immediately after
+           copper. Its quantity uses total copper length.
+        */
 
-            "Copper",
+        body: [
 
-            `${
-                number(
-                    getTotalCopperLength()
+            [
+
+                "Copper",
+
+                `${
+                    number(
+                        getTotalCopperLength()
+                    )
+                } m`,
+
+                money(
+                    quotation.copperRate
+                ),
+
+                money(
+                    getCopperTotal()
                 )
-            } m`,
 
-            money(
-                quotation.copperRate
-            ),
+            ],
 
-            money(
-                getCopperTotal()
-            )
+            [
 
-        ]],
+                quotation.flexibleCableType ||
+                "1.5mm 3 core flexible cable",
+
+                `${
+                    number(
+                        getTotalCopperLength()
+                    )
+                } m`,
+
+                money(
+                    quotation.flexibleCableRate
+                ),
+
+                money(
+                    getFlexibleCableTotal()
+                )
+
+            ]
+
+        ],
 
 
         theme:
@@ -7401,6 +8822,7 @@ function createPDF(
 
 
         ...quotation.additionalItems.map(
+
             item => [
 
                 item.name,
@@ -7422,6 +8844,7 @@ function createPDF(
                 )
 
             ]
+
         )
 
     ];
@@ -7594,6 +9017,7 @@ function createPDF(
         y
 
     );
+
 }
 
 
@@ -7605,10 +9029,20 @@ function startNewQuotation() {
 
     quotation = {
 
-        rooms: [],
+        quotationType:
+            "",
+
+        rooms:
+            [],
 
         copperRate:
             3200,
+
+        flexibleCableType:
+            "1.5mm 3 core flexible cable",
+
+        flexibleCableRate:
+            0,
 
         drainageRate:
             0,
@@ -7628,7 +9062,8 @@ function startNewQuotation() {
         installationTotal:
             0,
 
-        additionalItems: [],
+        additionalItems:
+            [],
 
         includePreliminaries:
             false,
@@ -7642,7 +9077,8 @@ function startNewQuotation() {
         asBuiltDrawingCost:
             5000,
 
-        acPrices: [],
+        acPrices:
+            [],
 
         clientName:
             "",
@@ -7710,7 +9146,9 @@ function startNewQuotation() {
     ].forEach(id => {
 
         const element =
-            document.getElementById(id);
+            document.getElementById(
+                id
+            );
 
 
         if (element) {
@@ -7737,7 +9175,8 @@ function startNewQuotation() {
     }
 
 
-    showPage(1);
+    showPage(0);
+
 }
 
 
@@ -7746,7 +9185,9 @@ function startNewQuotation() {
    ========================================================= */
 
 document.addEventListener(
+
     "DOMContentLoaded",
+
     function () {
 
         /*
@@ -7781,7 +9222,8 @@ document.addEventListener(
         }
 
 
-        showPage(1);
+        showPage(0);
 
     }
+
 );
